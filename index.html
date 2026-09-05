@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Interactive historical atlas of changing borders, states, empires, cultures, and settlements through time."
+  >
+
+  <title>Historical Atlas</title>
+
+  <!-- =====================================================
+       D3
+       ===================================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"
+    defer
+  ></script>
+
+  <!-- =====================================================
+       APPLICATION STYLES
+       ===================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="./styles.css"
+  >
+</head>
+
+<body>
+
+  <!-- =====================================================
+       APPLICATION
+       ===================================================== -->
+
+  <div
+    id="app"
+    class="atlas-app"
+  >
+
+    <!-- ===================================================
+         HEADER
+         =================================================== -->
+
+    <header class="atlas-header">
+
+      <div class="brand">
+
+        <div class="brand-mark">
+          ◉
+        </div>
+
+        <div class="brand-text">
+
+          <h1>
+            Historical Atlas
+          </h1>
+
+          <p>
+            The world through time
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="header-center">
+
+        <div
+          id="yearLabel"
+          class="current-year"
+        >
+          Loading…
+        </div>
+
+      </div>
+
+
+      <div class="header-actions">
+
+        <button
+          id="searchToggle"
+          class="icon-button"
+          type="button"
+          aria-label="Search"
+          title="Search"
+        >
+          ⌕
+        </button>
+
+        <button
+          id="aboutButton"
+          class="icon-button"
+          type="button"
+          aria-label="About"
+          title="About the atlas"
+        >
+          ?
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- ===================================================
+         MAIN ATLAS AREA
+         =================================================== -->
+
+    <main class="atlas-main">
+
+
+      <!-- ===============================================
+           LEFT SIDEBAR
+           =============================================== -->
+
+      <aside
+        id="sidebar"
+        class="atlas-sidebar"
+      >
+
+        <!-- ---------------------------------------------
+             SEARCH
+             --------------------------------------------- -->
+
+        <section class="sidebar-section search-section">
+
+          <label
+            for="search"
+            class="section-label"
+          >
+            Find a place or polity
+          </label>
+
+          <div class="search-box">
+
+            <span class="search-icon">
+              ⌕
+            </span>
+
+            <input
+              id="search"
+              type="search"
+              placeholder="Search historical entities…"
+              autocomplete="off"
+            >
+
+          </div>
+
+        </section>
+
+
+        <!-- ---------------------------------------------
+             CURRENT DATE
+             --------------------------------------------- -->
+
+        <section class="sidebar-section date-section">
+
+          <div class="date-heading">
+            <span class="section-label">
+              Historical date
+            </span>
+          </div>
+
+          <div class="date-display">
+
+            <div
+              id="sidebarYear"
+              class="sidebar-year"
+            >
+              —
+            </div>
+
+            <div class="date-context">
+              Selected map
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ---------------------------------------------
+             ENTITY LIST
+             --------------------------------------------- -->
+
+        <section
+          class="sidebar-section entities-section"
+        >
+
+          <div class="section-heading">
+
+            <span class="section-label">
+              Entities
+            </span>
+
+            <span
+              id="entityCount"
+              class="section-count"
+            >
+              —
+            </span>
+
+          </div>
+
+          <div
+            id="entityList"
+            class="entity-list"
+          >
+
+            <div class="empty-state">
+              Loading entities…
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ---------------------------------------------
+             LEGEND
+             --------------------------------------------- -->
+
+        <section
+          class="sidebar-section legend-section"
+        >
+
+          <div class="section-label">
+            Border confidence
+          </div>
+
+          <div class="legend">
+
+            <div class="legend-item">
+
+              <span
+                class="legend-line precision-high"
+              ></span>
+
+              <span>
+                Precise
+              </span>
+
+            </div>
+
+            <div class="legend-item">
+
+              <span
+                class="legend-line precision-medium"
+              ></span>
+
+              <span>
+                Moderately precise
+              </span>
+
+            </div>
+
+            <div class="legend-item">
+
+              <span
+                class="legend-line precision-low"
+              ></span>
+
+              <span>
+                Approximate
+              </span>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </aside>
+
+
+      <!-- ===============================================
+           MAP
+           =============================================== -->
+
+      <section
+        id="map"
+        class="atlas-map"
+        aria-label="Historical world map"
+      >
+
+        <!-- D3 inserts SVG here -->
+
+        <div
+          id="loading"
+          class="loading-overlay"
+        >
+          Loading historical atlas…
+        </div>
+
+        <div
+          id="error"
+          class="error-overlay"
+          hidden
+        ></div>
+
+      </section>
+
+
+      <!-- ===============================================
+           MAP CONTROLS
+           =============================================== -->
+
+      <div
+        class="map-controls"
+        aria-label="Map controls"
+      >
+
+        <button
+          id="zoomIn"
+          class="map-control"
+          type="button"
+          aria-label="Zoom in"
+          title="Zoom in"
+        >
+          +
+        </button>
+
+        <button
+          id="zoomOut"
+          class="map-control"
+          type="button"
+          aria-label="Zoom out"
+          title="Zoom out"
+        >
+          −
+        </button>
+
+        <button
+          id="resetMap"
+          class="map-control"
+          type="button"
+          aria-label="Reset map"
+          title="Reset map"
+        >
+          ◌
+        </button>
+
+      </div>
+
+
+      <!-- ===============================================
+           MAP INFORMATION
+           =============================================== -->
+
+      <div
+        id="mapInfo"
+        class="map-info-panel"
+      >
+
+        <div class="map-info-header">
+
+          <div>
+
+            <span class="info-kicker">
+              WORLD
+            </span>
+
+            <h2 id="mapInfoTitle">
+              Historical Atlas
+            </h2>
+
+          </div>
+
+          <button
+            id="closeMapInfo"
+            class="panel-close"
+            type="button"
+            aria-label="Close information panel"
+          >
+            ×
+          </button>
+
+        </div>
+
+        <div
+          id="mapInfoContent"
+          class="map-info-content"
+        >
+          Select an entity on the map to inspect it.
+        </div>
+
+      </div>
+
+    </main>
+
+
+    <!-- ===================================================
+         TIMELINE
+         =================================================== -->
+
+    <section
+      id="timelinePanel"
+      class="timeline-panel"
+    >
+
+      <!-- -----------------------------------------------
+           TIMELINE HEADER
+           ----------------------------------------------- -->
+
+      <div class="timeline-header">
+
+        <div class="timeline-title">
+
+          <span class="timeline-kicker">
+            CHRONOLOGY
+          </span>
+
+          <strong>
+            Historical timeline
+          </strong>
+
+        </div>
+
+
+        <div class="timeline-date">
+
+          <span
+            id="timelineYearLabel"
+            class="timeline-current-year"
+          >
+            —
+          </span>
+
+        </div>
+
+
+        <div class="timeline-actions">
+
+          <button
+            id="prevButton"
+            class="timeline-button"
+            type="button"
+            title="Previous historical map"
+            aria-label="Previous historical map"
+          >
+            ‹
+          </button>
+
+          <button
+            id="playButton"
+            class="timeline-play"
+            type="button"
+            title="Play timeline"
+          >
+            Play
+          </button>
+
+          <button
+            id="nextButton"
+            class="timeline-button"
+            type="button"
+            title="Next historical map"
+            aria-label="Next historical map"
+          >
+            ›
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- -----------------------------------------------
+           TIMELINE TRACK
+           ----------------------------------------------- -->
+
+      <div
+        class="timeline-container"
+      >
+
+        <div
+          class="timeline-rail"
+        >
+
+          <div
+            id="timelineTicks"
+            class="timeline-ticks"
+          >
+            <!-- JS can populate important dates later -->
+          </div>
+
+          <input
+            id="timeline"
+            class="timeline-slider"
+            type="range"
+            min="0"
+            max="1"
+            step="1"
+            value="0"
+            aria-label="Historical timeline"
+          >
+
+        </div>
+
+
+        <!-- -------------------------------------------
+             TIMELINE SCALE
+             ------------------------------------------- -->
+
+        <div
+          id="timelineLabels"
+          class="timeline-labels"
+        >
+
+          <span>
+            Earliest
+          </span>
+
+          <span>
+            Present
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- -----------------------------------------------
+           QUICK PERIODS
+           ----------------------------------------------- -->
+
+      <div
+        class="timeline-periods"
+        aria-label="Historical periods"
+      >
+
+        <button
+          class="period-button"
+          type="button"
+          data-year="-10000"
+        >
+          Prehistory
+        </button>
+
+        <button
+          class="period-button"
+          type="button"
+          data-year="-3000"
+        >
+          Ancient
+        </button>
+
+        <button
+          class="period-button"
+          type="button"
+          data-year="500"
+        >
+          Classical
+        </button>
+
+        <button
+          class="period-button"
+          type="button"
+          data-year="1000"
+        >
+          Medieval
+        </button>
+
+        <button
+          class="period-button"
+          type="button"
+          data-year="1500"
+        >
+          Early Modern
+        </button>
+
+        <button
+          class="period-button"
+          type="button"
+          data-year="1800"
+        >
+          Modern
+        </button>
+
+        <button
+          class="period-button"
+          type="button"
+          data-year="1900"
+        >
+          20th Century
+        </button>
+
+        <button
+          class="period-button"
+          type="button"
+          data-year="2000"
+        >
+          Contemporary
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         STATUS BAR
+         =================================================== -->
+
+    <footer class="atlas-footer">
+
+      <div class="footer-left">
+
+        <span>
+          Historical Atlas
+        </span>
+
+        <span class="footer-divider">
+          /
+        </span>
+
+        <span>
+          Historical boundaries &amp; cultural regions
+        </span>
+
+      </div>
+
+
+      <div class="footer-right">
+
+        <span id="featureCount">
+          —
+        </span>
+
+        <span>
+          regions
+        </span>
+
+        <span class="footer-divider">
+          ·
+        </span>
+
+        <span>
+          GeoJSON
+        </span>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+
+  <!-- =====================================================
+       ABOUT MODAL
+       ===================================================== -->
+
+  <div
+    id="aboutModal"
+    class="modal"
+    hidden
+  >
+
+    <div
+      class="modal-backdrop"
+      data-close-modal
+    ></div>
+
+    <div
+      class="modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="aboutTitle"
+    >
+
+      <div class="modal-header">
+
+        <div>
+
+          <span class="info-kicker">
+            ABOUT
+          </span>
+
+          <h2 id="aboutTitle">
+            Historical Atlas
+          </h2>
+
+        </div>
+
+        <button
+          id="closeAbout"
+          class="panel-close"
+          type="button"
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="modal-content">
+
+        <p>
+          An interactive visualization of historical
+          political boundaries, cultural regions,
+          settlements, and geographic change through time.
+        </p>
+
+        <p>
+          Historical borders are often approximate,
+          disputed, or overlapping. Treat the map as a
+          visualization of historical knowledge rather
+          than a definitive representation of territorial
+          sovereignty.
+        </p>
+
+        <div class="about-grid">
+
+          <div class="about-stat">
+
+            <strong>
+              GeoJSON
+            </strong>
+
+            <span>
+              Historical geographic data
+            </span>
+
+          </div>
+
+          <div class="about-stat">
+
+            <strong>
+              Timeline
+            </strong>
+
+            <span>
+              Time-indexed world maps
+            </span>
+
+          </div>
+
+          <div class="about-stat">
+
+            <strong>
+              Places
+            </strong>
+
+            <span>
+              Historical settlements
+            </span>
+
+          </div>
+
+          <div class="about-stat">
+
+            <strong>
+              Open Data
+            </strong>
+
+            <span>
+              Community maintained
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       SCRIPTS
+       ===================================================== -->
+
+  <script src="./app.js" defer></script>
+
+
+  <!-- =====================================================
+       SMALL UI BRIDGE
+       ===================================================== -->
+
+  <script defer>
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+
+        /*
+         * -----------------------------------------------
+         * Sidebar year synchronization
+         * -----------------------------------------------
+         */
+
+        const sidebarYear =
+          document.getElementById(
+            "sidebarYear"
+          );
+
+        const timelineYearLabel =
+          document.getElementById(
+            "timelineYearLabel"
+          );
+
+        const mainYearLabel =
+          document.getElementById(
+            "yearLabel"
+          );
+
+
+        /*
+         * -----------------------------------------------
+         * Format historical years
+         * -----------------------------------------------
+         */
+
+        function formatYear(year) {
+
+          const numeric =
+            Number(year);
+
+          if (
+            !Number.isFinite(numeric)
+          ) {
+            return "—";
+          }
+
+          if (numeric < 0) {
+            return `${Math.abs(numeric)} BC`;
+          }
+
+          if (numeric === 0) {
+            return "1 BC";
+          }
+
+          return `${numeric} AD`;
+        }
+
+
+        /*
+         * -----------------------------------------------
+         * Keep auxiliary UI synchronized
+         * -----------------------------------------------
+         */
+
+        function syncUI() {
+
+          if (
+            !window.Atlas
+          ) {
+            return;
+          }
+
+          const atlasState =
+            window.Atlas.getState();
+
+          const year =
+            atlasState.year;
+
+          if (sidebarYear) {
+            sidebarYear.textContent =
+              formatYear(year);
+          }
+
+          if (timelineYearLabel) {
+            timelineYearLabel.textContent =
+              formatYear(year);
+          }
+
+          if (mainYearLabel) {
+            mainYearLabel.textContent =
+              formatYear(year);
+          }
+
+          const featureCount =
+            document.getElementById(
+              "featureCount"
+            );
+
+          if (featureCount) {
+            featureCount.textContent =
+              atlasState.featureCount;
+          }
+
+          const entityCount =
+            document.getElementById(
+              "entityCount"
+            );
+
+          if (entityCount) {
+
+            entityCount.textContent =
+              document.querySelectorAll(
+                ".entity-item"
+              ).length;
+          }
+        }
+
+
+        /*
+         * -----------------------------------------------
+         * Watch atlas state
+         * -----------------------------------------------
+         */
+
+        window.setInterval(
+          syncUI,
+          250
+        );
+
+
+        /*
+         * -----------------------------------------------
+         * Quick historical periods
+         * -----------------------------------------------
+         */
+
+        document
+          .querySelectorAll(
+            ".period-button"
+          )
+          .forEach(
+            button => {
+
+              button.addEventListener(
+                "click",
+                () => {
+
+                  const year =
+                    Number(
+                      button.dataset.year
+                    );
+
+                  if (
+                    window.Atlas &&
+                    Number.isFinite(year)
+                  ) {
+                    window.Atlas.setYear(
+                      year
+                    );
+                  }
+
+                }
+              );
+
+            }
+          );
+
+
+        /*
+         * -----------------------------------------------
+         * About modal
+         * -----------------------------------------------
+         */
+
+        const aboutModal =
+          document.getElementById(
+            "aboutModal"
+          );
+
+        const aboutButton =
+          document.getElementById(
+            "aboutButton"
+          );
+
+        const closeAbout =
+          document.getElementById(
+            "closeAbout"
+          );
+
+
+        function openAbout() {
+
+          if (!aboutModal) {
+            return;
+          }
+
+          aboutModal.hidden =
+            false;
+
+          document.body.classList.add(
+            "modal-open"
+          );
+
+        }
+
+
+        function closeAboutModal() {
+
+          if (!aboutModal) {
+            return;
+          }
+
+          aboutModal.hidden =
+            true;
+
+          document.body.classList.remove(
+            "modal-open"
+          );
+
+        }
+
+
+        if (aboutButton) {
+
+          aboutButton.addEventListener(
+            "click",
+            openAbout
+          );
+
+        }
+
+
+        if (closeAbout) {
+
+          closeAbout.addEventListener(
+            "click",
+            closeAboutModal
+          );
+
+        }
+
+
+        document
+          .querySelectorAll(
+            "[data-close-modal]"
+          )
+          .forEach(
+            element => {
+
+              element.addEventListener(
+                "click",
+                closeAboutModal
+              );
+
+            }
+          );
+
+
+        document.addEventListener(
+          "keydown",
+          event => {
+
+            if (
+              event.key === "Escape"
+            ) {
+
+              closeAboutModal();
+
+            }
+
+          }
+        );
+
+
+        /*
+         * -----------------------------------------------
+         * Search toggle
+         * -----------------------------------------------
+         */
+
+        const searchToggle =
+          document.getElementById(
+            "searchToggle"
+          );
+
+        const search =
+          document.getElementById(
+            "search"
+          );
+
+
+        if (searchToggle && search) {
+
+          searchToggle.addEventListener(
+            "click",
+            () => {
+
+              search.focus();
+
+            }
+          );
+
+        }
+
+
+        /*
+         * -----------------------------------------------
+         * Map information panel
+         * -----------------------------------------------
+         */
+
+        const mapInfo =
+          document.getElementById(
+            "mapInfo"
+          );
+
+        const closeMapInfo =
+          document.getElementById(
+            "closeMapInfo"
+          );
+
+
+        if (closeMapInfo && mapInfo) {
+
+          closeMapInfo.addEventListener(
+            "click",
+            () => {
+
+              mapInfo.classList.remove(
+                "visible"
+              );
+
+            }
+          );
+
+        }
+
+
+        /*
+         * -----------------------------------------------
+         * Zoom controls
+         *
+         * These are intentionally prepared here.
+         * app.js can later expose a proper D3 zoom
+         * controller.
+         * -----------------------------------------------
+         */
+
+        const zoomIn =
+          document.getElementById(
+            "zoomIn"
+          );
+
+        const zoomOut =
+          document.getElementById(
+            "zoomOut"
+          );
+
+        const resetMap =
+          document.getElementById(
+            "resetMap"
+          );
+
+
+        /*
+         * Placeholder hooks.
+         *
+         * We'll connect these to D3 zoom in the next
+         * app.js pass without changing the HTML.
+         */
+
+        if (zoomIn) {
+
+          zoomIn.addEventListener(
+            "click",
+            () => {
+
+              window.dispatchEvent(
+                new CustomEvent(
+                  "atlas:zoom",
+                  {
+                    detail: {
+                      direction: "in"
+                    }
+                  }
+                )
+              );
+
+            }
+          );
+
+        }
+
+
+        if (zoomOut) {
+
+          zoomOut.addEventListener(
+            "click",
+            () => {
+
+              window.dispatchEvent(
+                new CustomEvent(
+                  "atlas:zoom",
+                  {
+                    detail: {
+                      direction: "out"
+                    }
+                  }
+                )
+              );
+
+            }
+          );
+
+        }
+
+
+        if (resetMap) {
+
+          resetMap.addEventListener(
+            "click",
+            () => {
+
+              window.dispatchEvent(
+                new CustomEvent(
+                  "atlas:zoom",
+                  {
+                    detail: {
+                      direction: "reset"
+                    }
+                  }
+                )
+              );
+
+            }
+          );
+
+        }
+
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
