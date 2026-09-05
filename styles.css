@@ -1,0 +1,1369 @@
+/* =========================================================
+   HISTORICAL ATLAS
+   Modern Cartographic Theme
+   ========================================================= */
+
+:root {
+  --bg: #0b0d0c;
+  --bg-elevated: #101311;
+  --panel: rgba(17, 20, 18, 0.94);
+  --panel-soft: rgba(23, 27, 24, 0.88);
+
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  --text: #ece9df;
+  --text-soft: #aaa89f;
+  --text-muted: #77776f;
+
+  --accent: #c9a96e;
+  --accent-bright: #e0c48b;
+  --accent-soft: rgba(201, 169, 110, 0.14);
+
+  --map-bg: #151917;
+  --map-land: #a89b7b;
+  --map-land-hover: #d0bd91;
+  --map-stroke: rgba(24, 27, 24, 0.75);
+
+  --success: #87a987;
+  --warning: #c6a66b;
+  --danger: #b9786e;
+
+  --shadow-lg: 0 18px 60px rgba(0, 0, 0, 0.38);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+  --radius-sm: 7px;
+  --radius-md: 11px;
+  --radius-lg: 16px;
+
+  --sidebar-width: 310px;
+  --timeline-height: 158px;
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   APP SHELL
+   ========================================================= */
+
+.atlas-app {
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 58px 1fr auto;
+  background:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(201, 169, 110, 0.055),
+      transparent 35%
+    ),
+    var(--bg);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.atlas-header {
+  position: relative;
+  z-index: 50;
+
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 20px;
+
+  background: rgba(10, 12, 11, 0.94);
+  border-bottom: 1px solid var(--border);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.atlas-brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 240px;
+}
+
+.atlas-brand-mark {
+  width: 30px;
+  height: 30px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(201, 169, 110, 0.35);
+  border-radius: 8px;
+
+  color: var(--accent);
+  background: var(--accent-soft);
+
+  font-size: 14px;
+}
+
+.atlas-brand h1 {
+  margin: 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.atlas-brand span {
+  display: block;
+  margin-top: -2px;
+
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.atlas-year {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  letter-spacing: 0.03em;
+  color: var(--accent-bright);
+}
+
+.atlas-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.icon-button,
+.header-button,
+.map-button,
+.timeline-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  color: var(--text-soft);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border);
+
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.icon-button:hover,
+.header-button:hover,
+.map-button:hover,
+.timeline-button:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.075);
+  border-color: var(--border-strong);
+}
+
+.icon-button:active,
+.header-button:active,
+.map-button:active,
+.timeline-button:active {
+  transform: translateY(1px);
+}
+
+.header-button {
+  height: 34px;
+  padding: 0 11px;
+
+  border-radius: var(--radius-sm);
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.atlas-main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+#sidebar {
+  position: relative;
+  z-index: 20;
+
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  background: rgba(14, 17, 15, 0.96);
+  border-right: 1px solid var(--border);
+
+  overflow: hidden;
+}
+
+.sidebar-top {
+  padding: 17px 16px 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
+}
+
+.sidebar-heading h2 {
+  margin: 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.sidebar-heading span {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.search-wrapper {
+  position: relative;
+}
+
+.search-wrapper::before {
+  content: "⌕";
+
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-52%);
+
+  color: var(--text-muted);
+  font-size: 18px;
+
+  pointer-events: none;
+}
+
+#search {
+  width: 100%;
+  height: 37px;
+
+  padding: 0 11px 0 34px;
+
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.045);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+
+  outline: none;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+#search::placeholder {
+  color: var(--text-muted);
+}
+
+#search:focus {
+  border-color: rgba(201, 169, 110, 0.45);
+  background: rgba(255, 255, 255, 0.065);
+}
+
+/* =========================================================
+   SIDEBAR STATS
+   ========================================================= */
+
+.sidebar-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 12px;
+
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+#sidebarYear {
+  color: var(--accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+}
+
+/* =========================================================
+   ENTITY LIST
+   ========================================================= */
+
+#entityList {
+  flex: 1;
+  min-height: 0;
+
+  padding: 8px;
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#entityList::-webkit-scrollbar {
+  width: 5px;
+}
+
+#entityList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#entityList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+.entity-item {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  width: 100%;
+  padding: 9px 10px;
+  margin-bottom: 2px;
+
+  color: var(--text-soft);
+  text-align: left;
+
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.entity-item:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.entity-item.active {
+  color: var(--text);
+  background: var(--accent-soft);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+
+.entity-item.active::before {
+  content: "";
+
+  position: absolute;
+  left: -1px;
+  top: 7px;
+  bottom: 7px;
+
+  width: 2px;
+
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.entity-name {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+}
+
+.entity-meta {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+/* =========================================================
+   BORDER LEGEND
+   ========================================================= */
+
+.border-legend {
+  padding: 13px 16px;
+
+  border-top: 1px solid var(--border);
+
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.border-legend-title {
+  margin-bottom: 8px;
+
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 5px 0;
+
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.legend-line {
+  width: 20px;
+  height: 1px;
+  background: var(--text-soft);
+}
+
+.legend-line.low {
+  opacity: 0.35;
+}
+
+.legend-line.medium {
+  opacity: 0.6;
+}
+
+.legend-line.high {
+  opacity: 0.95;
+}
+
+/* =========================================================
+   MAP
+   ========================================================= */
+
+#map {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.025),
+      transparent 68%
+    ),
+    var(--map-bg);
+}
+
+/*
+   Subtle cartographic grid.
+   This sits behind D3's map layer.
+*/
+
+#map::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+  z-index: 0;
+
+  opacity: 0.22;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    );
+
+  background-size: 80px 80px;
+}
+
+#map svg {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  height: 100%;
+
+  display: block;
+}
+
+/* =========================================================
+   D3 MAP FEATURES
+   ========================================================= */
+
+.country {
+  fill: var(--map-land);
+  stroke: var(--map-stroke);
+  stroke-width: 0.65px;
+
+  vector-effect: non-scaling-stroke;
+
+  transition:
+    fill 120ms ease,
+    opacity 120ms ease,
+    filter 120ms ease;
+}
+
+.country:hover {
+  fill: var(--map-land-hover);
+  cursor: pointer;
+  filter: brightness(1.08);
+}
+
+.country.selected {
+  fill: var(--accent-bright);
+}
+
+.country.low-confidence {
+  opacity: 0.55;
+}
+
+.country.medium-confidence {
+  opacity: 0.78;
+}
+
+.country.high-confidence {
+  opacity: 1;
+}
+
+.country.boundary-uncertain {
+  stroke-dasharray: 2 2;
+}
+
+/* =========================================================
+   MAP CONTROLS
+   ========================================================= */
+
+.map-controls {
+  position: absolute;
+  z-index: 10;
+
+  top: 16px;
+  right: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.map-button {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 7px;
+
+  font-size: 17px;
+}
+
+.map-button.reset {
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+/* =========================================================
+   MAP INFO PANEL
+   ========================================================= */
+
+#mapInfo {
+  position: absolute;
+  z-index: 15;
+
+  left: 18px;
+  bottom: 18px;
+
+  width: min(370px, calc(100% - 36px));
+
+  padding: 16px 17px;
+
+  background: rgba(14, 17, 15, 0.94);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+
+  box-shadow: var(--shadow-lg);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  animation: panel-in 180ms ease;
+}
+
+#mapInfo[hidden] {
+  display: none;
+}
+
+#mapInfoTitle {
+  margin: 0 28px 5px 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+#mapInfoContent {
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+#closeMapInfo {
+  position: absolute;
+
+  top: 9px;
+  right: 9px;
+
+  width: 27px;
+  height: 27px;
+
+  display: grid;
+  place-items: center;
+
+  color: var(--text-muted);
+  background: transparent;
+
+  border-radius: 5px;
+
+  cursor: pointer;
+}
+
+#closeMapInfo:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* =========================================================
+   LOADING / ERROR
+   ========================================================= */
+
+#loading,
+#error {
+  position: absolute;
+  inset: 0;
+
+  z-index: 30;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(11, 13, 12, 0.84);
+
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+#loading[hidden],
+#error[hidden] {
+  display: none;
+}
+
+.loading-inner,
+.error-inner {
+  max-width: 420px;
+  padding: 28px;
+
+  text-align: center;
+}
+
+.loading-title,
+.error-title {
+  margin-bottom: 7px;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+}
+
+.loading-text,
+.error-text {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.loading-spinner {
+  width: 26px;
+  height: 26px;
+
+  margin: 0 auto 14px;
+
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent);
+
+  border-radius: 50%;
+
+  animation: spin 800ms linear infinite;
+}
+
+/* =========================================================
+   TIMELINE
+   ========================================================= */
+
+#timelinePanel {
+  position: relative;
+  z-index: 40;
+
+  height: var(--timeline-height);
+
+  padding: 15px 22px 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(18, 21, 19, 0.98),
+      rgba(13, 15, 14, 0.98)
+    );
+
+  border-top: 1px solid var(--border);
+
+  box-shadow: 0 -12px 35px rgba(0, 0, 0, 0.18);
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
+}
+
+.timeline-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.timeline-title h2 {
+  margin: 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#timelineYearLabel {
+  color: var(--accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+}
+
+.timeline-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.timeline-button {
+  min-width: 31px;
+  height: 29px;
+
+  padding: 0 9px;
+
+  border-radius: 6px;
+
+  font-size: 12px;
+}
+
+#playButton {
+  min-width: 68px;
+  color: var(--accent-bright);
+  border-color: rgba(201, 169, 110, 0.22);
+  background: rgba(201, 169, 110, 0.07);
+}
+
+/* =========================================================
+   RANGE SLIDER
+   ========================================================= */
+
+.timeline-track {
+  position: relative;
+  padding: 5px 0;
+}
+
+#timeline {
+  width: 100%;
+  height: 22px;
+
+  margin: 0;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+/* WebKit */
+
+#timeline::-webkit-slider-runnable-track {
+  height: 3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent),
+      rgba(201, 169, 110, 0.3)
+    );
+
+  border-radius: 99px;
+}
+
+#timeline::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 15px;
+  height: 15px;
+
+  margin-top: -6px;
+
+  background: var(--accent-bright);
+
+  border: 3px solid var(--bg-elevated);
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 0 1px rgba(201, 169, 110, 0.65),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Firefox */
+
+#timeline::-moz-range-track {
+  height: 3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent),
+      rgba(201, 169, 110, 0.3)
+    );
+
+  border-radius: 99px;
+}
+
+#timeline::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+
+  background: var(--accent-bright);
+
+  border: 3px solid var(--bg-elevated);
+  border-radius: 50%;
+}
+
+/* =========================================================
+   TIMELINE TICKS
+   ========================================================= */
+
+#timelineTicks {
+  position: relative;
+
+  height: 15px;
+
+  margin-top: -1px;
+}
+
+.timeline-tick {
+  position: absolute;
+  top: 0;
+
+  width: 1px;
+  height: 5px;
+
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.timeline-tick.major {
+  height: 8px;
+  background: rgba(201, 169, 110, 0.55);
+}
+
+.timeline-tick-label {
+  position: absolute;
+  top: 9px;
+
+  transform: translateX(-50%);
+
+  color: var(--text-muted);
+  font-size: 9px;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   TIMELINE LABELS
+   ========================================================= */
+
+#timelineLabels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 12px;
+}
+
+.timeline-period {
+  padding: 4px 7px;
+
+  color: var(--text-muted);
+
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+
+  font-size: 10px;
+
+  cursor: pointer;
+
+  transition:
+    color 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.timeline-period:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border);
+}
+
+.timeline-period.active {
+  color: var(--accent-bright);
+  background: var(--accent-soft);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.atlas-footer {
+  position: absolute;
+
+  bottom: 7px;
+  right: 12px;
+
+  z-index: 12;
+
+  color: rgba(255, 255, 255, 0.32);
+
+  font-size: 9px;
+  letter-spacing: 0.04em;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   ABOUT MODAL
+   ========================================================= */
+
+#aboutModal {
+  position: fixed;
+  inset: 0;
+
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.68);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  animation: fade-in 160ms ease;
+}
+
+#aboutModal[hidden] {
+  display: none;
+}
+
+.about-card {
+  position: relative;
+
+  width: min(560px, 100%);
+
+  padding: 30px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(26, 29, 26, 0.98),
+      rgba(14, 17, 15, 0.98)
+    );
+
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+
+  box-shadow: var(--shadow-lg);
+}
+
+.about-card h2 {
+  margin: 0 0 7px;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.about-card .subtitle {
+  margin-bottom: 22px;
+
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.about-card p {
+  margin: 0 0 14px;
+
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.about-close {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  color: var(--text-muted);
+  background: transparent;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+}
+
+.about-close:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* =========================================================
+   SCROLLBARS
+   ========================================================= */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+  :root {
+    --sidebar-width: 250px;
+    --timeline-height: 150px;
+  }
+
+  .atlas-brand {
+    min-width: auto;
+  }
+
+  .atlas-brand span {
+    display: none;
+  }
+
+  #timelinePanel {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .timeline-period {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 680px) {
+  body {
+    overflow: auto;
+  }
+
+  .atlas-app {
+    min-height: 100vh;
+    height: auto;
+
+    grid-template-rows: 54px auto auto;
+  }
+
+  .atlas-header {
+    height: 54px;
+    padding: 0 12px;
+  }
+
+  .atlas-brand h1 {
+    font-size: 15px;
+  }
+
+  .atlas-brand-mark {
+    width: 27px;
+    height: 27px;
+  }
+
+  .atlas-year {
+    position: static;
+    transform: none;
+
+    margin-left: auto;
+    margin-right: 9px;
+
+    font-size: 15px;
+  }
+
+  .header-button {
+    width: 34px;
+    padding: 0;
+
+    font-size: 0;
+  }
+
+  .header-button::after {
+    content: "⋯";
+    font-size: 17px;
+  }
+
+  .atlas-main {
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  #sidebar {
+    order: 2;
+
+    height: 190px;
+
+    border-right: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  #map {
+    order: 1;
+
+    height: 58vh;
+    min-height: 390px;
+  }
+
+  .sidebar-top {
+    padding: 10px 12px;
+  }
+
+  #entityList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+  }
+
+  .entity-item {
+    margin: 0;
+  }
+
+  .border-legend {
+    display: none;
+  }
+
+  #timelinePanel {
+    height: auto;
+    min-height: 142px;
+
+    padding: 12px 12px 14px;
+  }
+
+  .timeline-header {
+    margin-bottom: 8px;
+  }
+
+  #timelineLabels {
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 3px;
+
+    padding-bottom: 2px;
+  }
+
+  .timeline-period {
+    flex-shrink: 0;
+  }
+
+  .atlas-footer {
+    display: none;
+  }
+}
+
+/* =========================================================
+   VERY SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 430px) {
+  #map {
+    min-height: 340px;
+  }
+
+  .atlas-brand h1 {
+    font-size: 14px;
+  }
+
+  .atlas-year {
+    font-size: 13px;
+  }
+
+  #mapInfo {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+
+    width: auto;
+  }
+
+  .map-controls {
+    top: 10px;
+    right: 10px;
+  }
+
+  .timeline-actions {
+    gap: 3px;
+  }
+
+  .timeline-button {
+    min-width: 28px;
+    padding: 0 7px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
