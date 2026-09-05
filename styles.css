@@ -1,497 +1,1109 @@
-/* =========================================================
+/* ==========================================================================
    HISTORICAL ATLAS
-   Modern Cartographic Theme
-   ========================================================= */
+   Enterprise UI System
+   Inspired by modern developer / infrastructure interfaces
+   ========================================================================== */
+
+/* ==========================================================================
+   01. DESIGN TOKENS
+   ========================================================================== */
 
 :root {
-  --bg: #0b0d0c;
-  --bg-elevated: #101311;
-  --panel: rgba(17, 20, 18, 0.94);
-  --panel-soft: rgba(23, 27, 24, 0.88);
+  /* ------------------------------------------------------------------------
+     Color — Foundation
+     ------------------------------------------------------------------------ */
+
+  --color-black: #000000;
+  --color-white: #ffffff;
+
+  --gray-0: #fafafa;
+  --gray-50: #f5f5f5;
+  --gray-100: #ededed;
+  --gray-200: #e4e4e4;
+  --gray-300: #d4d4d4;
+  --gray-400: #a3a3a3;
+  --gray-500: #737373;
+  --gray-600: #525252;
+  --gray-700: #404040;
+  --gray-800: #262626;
+  --gray-900: #171717;
+  --gray-950: #0a0a0a;
+
+  /* ------------------------------------------------------------------------
+     Color — Application
+     ------------------------------------------------------------------------ */
+
+  --background: #0a0a0a;
+  --background-subtle: #0d0d0d;
+  --surface: #0f0f0f;
+  --surface-raised: #141414;
+  --surface-hover: #181818;
+  --surface-active: #1c1c1c;
+
+  --foreground: #ededed;
+  --foreground-strong: #fafafa;
+  --foreground-muted: #a1a1a1;
+  --foreground-subtle: #737373;
+  --foreground-disabled: #525252;
 
   --border: rgba(255, 255, 255, 0.09);
-  --border-strong: rgba(255, 255, 255, 0.15);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.14);
 
-  --text: #ece9df;
-  --text-soft: #aaa89f;
-  --text-muted: #77776f;
+  /* ------------------------------------------------------------------------
+     Color — Atlas accent
+     ------------------------------------------------------------------------ */
 
-  --accent: #c9a96e;
-  --accent-bright: #e0c48b;
-  --accent-soft: rgba(201, 169, 110, 0.14);
+  --atlas-accent: #d0a85c;
+  --atlas-accent-hover: #dfb86d;
+  --atlas-accent-muted: rgba(208, 168, 92, 0.12);
+  --atlas-accent-border: rgba(208, 168, 92, 0.28);
 
-  --map-bg: #151917;
-  --map-land: #a89b7b;
-  --map-land-hover: #d0bd91;
-  --map-stroke: rgba(24, 27, 24, 0.75);
+  /* ------------------------------------------------------------------------
+     Color — Semantic
+     ------------------------------------------------------------------------ */
 
-  --success: #87a987;
-  --warning: #c6a66b;
-  --danger: #b9786e;
+  --success: #46a758;
+  --success-muted: rgba(70, 167, 88, 0.12);
 
-  --shadow-lg: 0 18px 60px rgba(0, 0, 0, 0.38);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --warning: #d29922;
+  --warning-muted: rgba(210, 153, 34, 0.12);
 
-  --radius-sm: 7px;
-  --radius-md: 11px;
-  --radius-lg: 16px;
+  --danger: #e5484d;
+  --danger-muted: rgba(229, 72, 77, 0.12);
 
-  --sidebar-width: 310px;
-  --timeline-height: 158px;
+  --info: #3b82f6;
+  --info-muted: rgba(59, 130, 246, 0.12);
 
-  font-family:
+  /* ------------------------------------------------------------------------
+     Typography
+     ------------------------------------------------------------------------ */
+
+  --font-sans:
     Inter,
     ui-sans-serif,
-    system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
     sans-serif;
+
+  --font-mono:
+    "SFMono-Regular",
+    "SF Mono",
+    Consolas,
+    "Liberation Mono",
+    Menlo,
+    monospace;
+
+  --font-serif:
+    "Iowan Old Style",
+    "Palatino Linotype",
+    Palatino,
+    Georgia,
+    serif;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-base: 14px;
+  --text-lg: 15px;
+  --text-xl: 17px;
+  --text-2xl: 20px;
+  --text-3xl: 24px;
+  --text-4xl: 30px;
+
+  --line-tight: 1.15;
+  --line-normal: 1.45;
+  --line-relaxed: 1.65;
+
+  /* ------------------------------------------------------------------------
+     Spacing
+     ------------------------------------------------------------------------ */
+
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ------------------------------------------------------------------------
+     Radius
+     ------------------------------------------------------------------------ */
+
+  --radius-none: 0;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* ------------------------------------------------------------------------
+     Shadows
+     ------------------------------------------------------------------------ */
+
+  --shadow-xs:
+    0 1px 2px rgba(0, 0, 0, 0.18);
+
+  --shadow-sm:
+    0 2px 6px rgba(0, 0, 0, 0.22);
+
+  --shadow-md:
+    0 8px 24px rgba(0, 0, 0, 0.28);
+
+  --shadow-lg:
+    0 16px 48px rgba(0, 0, 0, 0.38);
+
+  /* ------------------------------------------------------------------------
+     Layout
+     ------------------------------------------------------------------------ */
+
+  --header-height: 56px;
+
+  --sidebar-width: 280px;
+  --sidebar-width-collapsed: 0px;
+
+  --timeline-height: 176px;
+
+  --mobile-header-height: 52px;
+
+  /* ------------------------------------------------------------------------
+     Motion
+     ------------------------------------------------------------------------ */
+
+  --duration-fast: 100ms;
+  --duration-normal: 160ms;
+  --duration-slow: 240ms;
+
+  --ease-out:
+    cubic-bezier(0.16, 1, 0.3, 1);
+
+  --ease-in-out:
+    cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ------------------------------------------------------------------------
+     Layering
+     ------------------------------------------------------------------------ */
+
+  --z-base: 0;
+  --z-map: 1;
+  --z-map-controls: 10;
+  --z-sidebar: 20;
+  --z-timeline: 30;
+  --z-header: 40;
+  --z-popover: 50;
+  --z-modal: 100;
+  --z-toast: 200;
 }
 
-/* =========================================================
-   RESET
-   ========================================================= */
 
-* {
+/* ==========================================================================
+   02. GLOBAL RESET
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html,
-body {
+html {
   width: 100%;
   height: 100%;
-  margin: 0;
+
+  background: var(--background);
+
+  color-scheme: dark;
+
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+
+  font-synthesis: none;
 }
 
 body {
-  overflow: hidden;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 14px;
-  line-height: 1.5;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+
+  margin: 0;
+
+  background: var(--background);
+  color: var(--foreground);
+
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: var(--line-normal);
+
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
   text-rendering: optimizeLegibility;
 }
 
 button,
-input {
+input,
+select,
+textarea {
+  margin: 0;
+
   font: inherit;
 }
 
 button {
-  border: 0;
+  color: inherit;
 }
 
-button:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--accent);
+button,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+/* ==========================================================================
+   03. ACCESSIBILITY
+   ========================================================================== */
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--atlas-accent);
   outline-offset: 2px;
 }
 
-/* =========================================================
-   APP SHELL
-   ========================================================= */
-
-.atlas-app {
-  width: 100%;
-  height: 100vh;
-  display: grid;
-  grid-template-rows: 58px 1fr auto;
-  background:
-    radial-gradient(
-      circle at 50% -20%,
-      rgba(201, 169, 110, 0.055),
-      transparent 35%
-    ),
-    var(--bg);
+::selection {
+  color: var(--foreground-strong);
+  background: rgba(208, 168, 92, 0.25);
 }
 
-/* =========================================================
-   HEADER
-   ========================================================= */
+
+/* ==========================================================================
+   04. SCROLLBARS
+   ========================================================================== */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color:
+    rgba(255, 255, 255, 0.14)
+    transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+  background-clip: padding-box;
+}
+
+
+/* ==========================================================================
+   05. APPLICATION SHELL
+   ========================================================================== */
+
+.atlas-app {
+  position: relative;
+
+  width: 100%;
+  height: 100vh;
+  min-height: 0;
+
+  display: grid;
+
+  grid-template-rows:
+    var(--header-height)
+    minmax(0, 1fr);
+
+  overflow: hidden;
+
+  background: var(--background);
+}
+
+
+/* ==========================================================================
+   06. HEADER
+   ========================================================================== */
 
 .atlas-header {
   position: relative;
-  z-index: 50;
+  z-index: var(--z-header);
 
-  height: 58px;
+  width: 100%;
+  height: var(--header-height);
+
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 20px;
+  padding: 0 var(--space-4);
 
-  background: rgba(10, 12, 11, 0.94);
-  border-bottom: 1px solid var(--border);
+  background:
+    rgba(10, 10, 10, 0.94);
+
+  border-bottom:
+    1px solid var(--border);
 
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 
+
+/* --------------------------------------------------------------------------
+   Brand
+   -------------------------------------------------------------------------- */
+
 .atlas-brand {
   display: flex;
   align-items: center;
-  gap: 13px;
-  min-width: 240px;
+  gap: var(--space-3);
+
+  min-width: 220px;
+
+  user-select: none;
 }
 
 .atlas-brand-mark {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
+
+  flex: 0 0 28px;
 
   display: grid;
   place-items: center;
 
-  border: 1px solid rgba(201, 169, 110, 0.35);
-  border-radius: 8px;
+  color: var(--foreground-strong);
 
-  color: var(--accent);
-  background: var(--accent-soft);
+  background: var(--foreground-strong);
 
-  font-size: 14px;
+  border-radius: var(--radius-sm);
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+
+  overflow: hidden;
+}
+
+.atlas-brand-mark::before {
+  content: "";
+
+  width: 13px;
+  height: 13px;
+
+  border:
+    1.5px solid var(--background);
+
+  border-radius: 50%;
+
+  opacity: 0.85;
 }
 
 .atlas-brand h1 {
   margin: 0;
 
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 17px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  color: var(--foreground-strong);
+
+  font-size: var(--text-md);
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  line-height: 1;
 }
 
 .atlas-brand span {
   display: block;
-  margin-top: -2px;
 
-  color: var(--text-muted);
+  margin-top: 3px;
+
+  color: var(--foreground-subtle);
+
   font-size: 10px;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
+
+
+/* --------------------------------------------------------------------------
+   Current year
+   -------------------------------------------------------------------------- */
 
 .atlas-year {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
 
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 19px;
-  letter-spacing: 0.03em;
-  color: var(--accent-bright);
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  color: var(--foreground-strong);
+
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  letter-spacing: -0.01em;
 }
+
+
+/* --------------------------------------------------------------------------
+   Header actions
+   -------------------------------------------------------------------------- */
 
 .atlas-header-actions {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-2);
+
+  min-width: 220px;
+
+  justify-content: flex-end;
 }
 
-/* =========================================================
-   BUTTONS
-   ========================================================= */
 
-.icon-button,
+/* ==========================================================================
+   07. BUTTON SYSTEM
+   ========================================================================== */
+
+/*
+   All application buttons use the same foundation.
+
+   Variants:
+   .button-primary
+   .button-secondary
+   .button-ghost
+   .button-danger
+   .icon-button
+   .header-button
+   .map-button
+   .timeline-button
+*/
+
 .header-button,
 .map-button,
-.timeline-button {
+.timeline-button,
+.icon-button {
+  position: relative;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
+  min-width: 32px;
+  height: 32px;
+
+  padding:
+    0 var(--space-3);
+
+  color: var(--foreground-muted);
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  border:
+    1px solid var(--border);
+
+  border-radius: var(--radius-md);
+
   cursor: pointer;
 
-  color: var(--text-soft);
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--border);
-
   transition:
-    background 160ms ease,
-    color 160ms ease,
-    border-color 160ms ease,
-    transform 160ms ease;
+    color var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-fast) ease;
 }
 
-.icon-button:hover,
 .header-button:hover,
 .map-button:hover,
-.timeline-button:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.075);
-  border-color: var(--border-strong);
+.timeline-button:hover,
+.icon-button:hover {
+  color: var(--foreground-strong);
+
+  background:
+    rgba(255, 255, 255, 0.07);
+
+  border-color:
+    var(--border-strong);
 }
 
-.icon-button:active,
 .header-button:active,
 .map-button:active,
-.timeline-button:active {
+.timeline-button:active,
+.icon-button:active {
   transform: translateY(1px);
 }
 
-.header-button {
-  height: 34px;
-  padding: 0 11px;
+.header-button:disabled,
+.map-button:disabled,
+.timeline-button:disabled,
+.icon-button:disabled {
+  color: var(--foreground-disabled);
 
-  border-radius: var(--radius-sm);
+  background:
+    rgba(255, 255, 255, 0.02);
 
-  font-size: 12px;
+  border-color:
+    var(--border-subtle);
+
+  opacity: 0.55;
 }
 
-/* =========================================================
-   MAIN CONTENT
-   ========================================================= */
+
+/* --------------------------------------------------------------------------
+   Header button
+   -------------------------------------------------------------------------- */
+
+.header-button {
+  min-width: 32px;
+
+  height: 32px;
+
+  font-size: var(--text-sm);
+  font-weight: 450;
+}
+
+
+/* --------------------------------------------------------------------------
+   Generic icon button
+   -------------------------------------------------------------------------- */
+
+.icon-button {
+  width: 32px;
+  padding: 0;
+}
+
+
+/* ==========================================================================
+   08. PRIMARY / SECONDARY BUTTONS
+   ========================================================================== */
+
+.button-primary,
+.button-secondary,
+.button-ghost,
+.button-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+
+  height: 36px;
+
+  padding:
+    0 var(--space-4);
+
+  border-radius: var(--radius-md);
+
+  font-size: var(--text-sm);
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-fast) ease;
+}
+
+.button-primary {
+  color: #111;
+
+  background: var(--foreground-strong);
+
+  border: 1px solid rgba(255, 255, 255, 0.9);
+
+  box-shadow:
+    var(--shadow-xs);
+}
+
+.button-primary:hover {
+  background: #ffffff;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.button-primary:active {
+  transform: translateY(1px);
+}
+
+.button-secondary {
+  color: var(--foreground);
+
+  background: rgba(255, 255, 255, 0.05);
+
+  border: 1px solid var(--border);
+}
+
+.button-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-strong);
+}
+
+.button-ghost {
+  color: var(--foreground-muted);
+
+  background: transparent;
+
+  border: 1px solid transparent;
+}
+
+.button-ghost:hover {
+  color: var(--foreground);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.button-danger {
+  color: #ffb8b8;
+
+  background: var(--danger-muted);
+
+  border: 1px solid rgba(229, 72, 77, 0.22);
+}
+
+.button-danger:hover {
+  background: rgba(229, 72, 77, 0.18);
+  border-color: rgba(229, 72, 77, 0.34);
+}
+
+
+/* ==========================================================================
+   09. MAIN APPLICATION AREA
+   ========================================================================== */
 
 .atlas-main {
+  position: relative;
+
+  min-width: 0;
   min-height: 0;
+
   display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
+
+  grid-template-columns:
+    var(--sidebar-width)
+    minmax(0, 1fr);
+
+  overflow: hidden;
 }
 
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
+
+/* ==========================================================================
+   10. SIDEBAR
+   ========================================================================== */
 
 #sidebar {
   position: relative;
-  z-index: 20;
+  z-index: var(--z-sidebar);
 
+  min-width: 0;
   min-height: 0;
 
   display: flex;
   flex-direction: column;
 
-  background: rgba(14, 17, 15, 0.96);
-  border-right: 1px solid var(--border);
+  background: var(--surface);
+
+  border-right:
+    1px solid var(--border);
 
   overflow: hidden;
 }
 
+
+/* --------------------------------------------------------------------------
+   Sidebar header
+   -------------------------------------------------------------------------- */
+
 .sidebar-top {
-  padding: 17px 16px 13px;
-  border-bottom: 1px solid var(--border);
+  flex: 0 0 auto;
+
+  padding:
+    var(--space-4);
+
+  border-bottom:
+    1px solid var(--border);
 }
 
 .sidebar-heading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .sidebar-heading h2 {
   margin: 0;
 
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
-  font-weight: 500;
+  color: var(--foreground-strong);
+
+  font-size: var(--text-md);
+  font-weight: 550;
+
+  letter-spacing: -0.01em;
 }
 
 .sidebar-heading span {
-  color: var(--text-muted);
-  font-size: 11px;
+  color: var(--foreground-subtle);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
 }
 
-/* =========================================================
-   SEARCH
-   ========================================================= */
+
+/* ==========================================================================
+   11. SEARCH INPUT
+   ========================================================================== */
 
 .search-wrapper {
   position: relative;
+
+  width: 100%;
 }
 
 .search-wrapper::before {
-  content: "⌕";
+  content: "";
 
   position: absolute;
+
   left: 11px;
   top: 50%;
-  transform: translateY(-52%);
 
-  color: var(--text-muted);
-  font-size: 18px;
+  width: 13px;
+  height: 13px;
+
+  transform: translateY(-50%);
+
+  border:
+    1.5px solid var(--foreground-subtle);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.search-wrapper::after {
+  content: "";
+
+  position: absolute;
+
+  left: 22px;
+  top: calc(50% + 5px);
+
+  width: 5px;
+  height: 1.5px;
+
+  transform:
+    rotate(45deg);
+
+  transform-origin: left center;
+
+  background: var(--foreground-subtle);
 
   pointer-events: none;
 }
 
 #search {
   width: 100%;
-  height: 37px;
+  height: 36px;
 
-  padding: 0 11px 0 34px;
+  padding:
+    0 34px;
 
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.045);
+  color: var(--foreground);
 
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-md);
 
   outline: none;
 
+  font-size: var(--text-sm);
+
   transition:
-    border-color 160ms ease,
-    background 160ms ease;
+    background var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
 }
 
 #search::placeholder {
-  color: var(--text-muted);
+  color: var(--foreground-subtle);
+}
+
+#search:hover {
+  border-color: var(--border-strong);
 }
 
 #search:focus {
-  border-color: rgba(201, 169, 110, 0.45);
-  background: rgba(255, 255, 255, 0.065);
+  background:
+    rgba(255, 255, 255, 0.055);
+
+  border-color:
+    rgba(255, 255, 255, 0.2);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.035);
 }
 
-/* =========================================================
-   SIDEBAR STATS
-   ========================================================= */
+
+/* ==========================================================================
+   12. SIDEBAR META
+   ========================================================================== */
 
 .sidebar-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  margin-top: 12px;
+  margin-top: var(--space-3);
 
-  color: var(--text-muted);
-  font-size: 11px;
+  color: var(--foreground-subtle);
+
+  font-size: var(--text-xs);
 }
 
 #sidebarYear {
-  color: var(--accent);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 12px;
+  color: var(--foreground-muted);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
 }
 
-/* =========================================================
-   ENTITY LIST
-   ========================================================= */
+
+/* ==========================================================================
+   13. ENTITY LIST
+   ========================================================================== */
 
 #entityList {
-  flex: 1;
+  flex: 1 1 auto;
+
   min-height: 0;
 
-  padding: 8px;
+  padding:
+    var(--space-2);
 
+  overflow-x: hidden;
   overflow-y: auto;
+
   overscroll-behavior: contain;
 }
 
-#entityList::-webkit-scrollbar {
-  width: 5px;
-}
 
-#entityList::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-#entityList::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-}
+/* --------------------------------------------------------------------------
+   Entity item
+   -------------------------------------------------------------------------- */
 
 .entity-item {
   position: relative;
 
+  width: 100%;
+
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: flex-start;
 
-  width: 100%;
-  padding: 9px 10px;
-  margin-bottom: 2px;
+  padding:
+    9px 10px;
 
-  color: var(--text-soft);
-  text-align: left;
+  margin: 1px 0;
+
+  color: var(--foreground-muted);
 
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 7px;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    var(--radius-sm);
+
+  text-align: left;
 
   cursor: pointer;
 
   transition:
-    background 140ms ease,
-    border-color 140ms ease,
-    color 140ms ease;
+    color var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out);
 }
 
 .entity-item:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.045);
+  color: var(--foreground);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border-color:
+    rgba(255, 255, 255, 0.045);
+}
+
+.entity-item:active {
+  background:
+    rgba(255, 255, 255, 0.07);
 }
 
 .entity-item.active {
-  color: var(--text);
-  background: var(--accent-soft);
-  border-color: rgba(201, 169, 110, 0.18);
+  color: var(--foreground-strong);
+
+  background:
+    var(--atlas-accent-muted);
+
+  border-color:
+    rgba(208, 168, 92, 0.16);
 }
 
 .entity-item.active::before {
   content: "";
 
   position: absolute;
+
   left: -1px;
   top: 7px;
   bottom: 7px;
 
   width: 2px;
 
-  background: var(--accent);
-  border-radius: 2px;
+  background:
+    var(--atlas-accent);
+
+  border-radius:
+    0 2px 2px 0;
 }
 
 .entity-name {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 13px;
+  width: 100%;
+
+  overflow: hidden;
+
+  color: inherit;
+
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  font-weight: 500;
+
+  line-height: var(--line-tight);
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .entity-meta {
-  color: var(--text-muted);
-  font-size: 10px;
+  margin-top: 3px;
+
+  color: var(--foreground-subtle);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+
+  line-height: 1.3;
 }
 
-/* =========================================================
-   BORDER LEGEND
-   ========================================================= */
+
+/* ==========================================================================
+   14. SIDEBAR LEGEND
+   ========================================================================== */
 
 .border-legend {
-  padding: 13px 16px;
+  flex: 0 0 auto;
 
-  border-top: 1px solid var(--border);
+  padding:
+    var(--space-3)
+    var(--space-4);
 
-  background: rgba(255, 255, 255, 0.012);
+  background:
+    rgba(255, 255, 255, 0.012);
+
+  border-top:
+    1px solid var(--border);
 }
 
 .border-legend-title {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 
-  color: var(--text-muted);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  color: var(--foreground-subtle);
+
+  font-size: 9px;
+  font-weight: 550;
+
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
 .legend-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+
+  gap: var(--space-2);
 
   margin: 5px 0;
 
-  color: var(--text-muted);
+  color: var(--foreground-subtle);
+
   font-size: 10px;
 }
 
 .legend-line {
-  width: 20px;
+  width: 22px;
   height: 1px;
-  background: var(--text-soft);
+
+  flex: 0 0 22px;
+
+  background:
+    var(--foreground-muted);
 }
 
 .legend-line.low {
-  opacity: 0.35;
+  opacity: 0.3;
 }
 
 .legend-line.medium {
@@ -499,79 +1111,92 @@ input:focus-visible {
 }
 
 .legend-line.high {
-  opacity: 0.95;
+  opacity: 1;
 }
 
-/* =========================================================
-   MAP
-   ========================================================= */
+
+/* ==========================================================================
+   15. MAP
+   ========================================================================== */
 
 #map {
   position: relative;
+
   min-width: 0;
   min-height: 0;
 
   overflow: hidden;
 
   background:
-    radial-gradient(
-      ellipse at center,
-      rgba(255, 255, 255, 0.025),
-      transparent 68%
-    ),
-    var(--map-bg);
+    #111413;
 }
 
-/*
-   Subtle cartographic grid.
-   This sits behind D3's map layer.
-*/
+
+/* --------------------------------------------------------------------------
+   Subtle map grid
+   -------------------------------------------------------------------------- */
 
 #map::before {
   content: "";
 
   position: absolute;
+
   inset: 0;
 
-  pointer-events: none;
   z-index: 0;
 
-  opacity: 0.22;
+  pointer-events: none;
+
+  opacity: 0.45;
 
   background-image:
     linear-gradient(
-      rgba(255, 255, 255, 0.025) 1px,
+      rgba(255, 255, 255, 0.018) 1px,
       transparent 1px
     ),
     linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.025) 1px,
+      rgba(255, 255, 255, 0.018) 1px,
       transparent 1px
     );
 
-  background-size: 80px 80px;
+  background-size:
+    96px 96px;
 }
+
+
+/* --------------------------------------------------------------------------
+   Map SVG
+   -------------------------------------------------------------------------- */
 
 #map svg {
   position: relative;
-  z-index: 1;
+
+  z-index: var(--z-map);
+
+  display: block;
 
   width: 100%;
   height: 100%;
-
-  display: block;
 }
 
-/* =========================================================
-   D3 MAP FEATURES
-   ========================================================= */
+
+/* ==========================================================================
+   16. D3 MAP FEATURES
+   ========================================================================== */
 
 .country {
-  fill: var(--map-land);
-  stroke: var(--map-stroke);
-  stroke-width: 0.65px;
+  fill:
+    #8e8875;
 
-  vector-effect: non-scaling-stroke;
+  stroke:
+    rgba(8, 10, 9, 0.75);
+
+  stroke-width:
+    0.65px;
+
+  vector-effect:
+    non-scaling-stroke;
 
   transition:
     fill 120ms ease,
@@ -580,21 +1205,26 @@ input:focus-visible {
 }
 
 .country:hover {
-  fill: var(--map-land-hover);
+  fill:
+    #b4aa8f;
+
+  filter:
+    brightness(1.08);
+
   cursor: pointer;
-  filter: brightness(1.08);
 }
 
 .country.selected {
-  fill: var(--accent-bright);
+  fill:
+    var(--atlas-accent);
 }
 
 .country.low-confidence {
-  opacity: 0.55;
+  opacity: 0.48;
 }
 
 .country.medium-confidence {
-  opacity: 0.78;
+  opacity: 0.72;
 }
 
 .country.high-confidence {
@@ -602,64 +1232,123 @@ input:focus-visible {
 }
 
 .country.boundary-uncertain {
-  stroke-dasharray: 2 2;
+  stroke-dasharray:
+    2 2;
 }
 
-/* =========================================================
-   MAP CONTROLS
-   ========================================================= */
+
+/* ==========================================================================
+   17. MAP CONTROLS
+   ========================================================================== */
 
 .map-controls {
   position: absolute;
-  z-index: 10;
 
-  top: 16px;
-  right: 16px;
+  z-index: var(--z-map-controls);
+
+  top: var(--space-4);
+  right: var(--space-4);
 
   display: flex;
   flex-direction: column;
-  gap: 5px;
+
+  gap: var(--space-1);
+
+  padding: var(--space-1);
+
+  background:
+    rgba(15, 15, 15, 0.86);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-md);
+
+  box-shadow:
+    var(--shadow-sm);
+
+  backdrop-filter:
+    blur(10px);
+
+  -webkit-backdrop-filter:
+    blur(10px);
 }
 
 .map-button {
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
 
-  border-radius: 7px;
+  min-width: 30px;
 
-  font-size: 17px;
+  padding: 0;
+
+  background:
+    transparent;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    var(--radius-sm);
+
+  font-size: 15px;
+}
+
+.map-button:hover {
+  background:
+    rgba(255, 255, 255, 0.07);
+
+  border-color:
+    rgba(255, 255, 255, 0.05);
 }
 
 .map-button.reset {
-  margin-top: 5px;
-  font-size: 13px;
+  margin-top: var(--space-1);
+
+  font-size: 12px;
 }
 
-/* =========================================================
-   MAP INFO PANEL
-   ========================================================= */
+
+/* ==========================================================================
+   18. MAP INFORMATION PANEL
+   ========================================================================== */
 
 #mapInfo {
   position: absolute;
-  z-index: 15;
 
-  left: 18px;
-  bottom: 18px;
+  z-index: var(--z-map-controls);
 
-  width: min(370px, calc(100% - 36px));
+  left: var(--space-4);
+  bottom: var(--space-4);
 
-  padding: 16px 17px;
+  width: min(380px, calc(100% - 32px));
 
-  background: rgba(14, 17, 15, 0.94);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
+  padding:
+    var(--space-4);
 
-  box-shadow: var(--shadow-lg);
+  background:
+    rgba(15, 15, 15, 0.93);
 
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  border:
+    1px solid var(--border-strong);
 
-  animation: panel-in 180ms ease;
+  border-radius:
+    var(--radius-lg);
+
+  box-shadow:
+    var(--shadow-lg);
+
+  backdrop-filter:
+    blur(14px);
+
+  -webkit-backdrop-filter:
+    blur(14px);
+
+  animation:
+    atlas-panel-enter
+    var(--duration-slow)
+    var(--ease-out);
 }
 
 #mapInfo[hidden] {
@@ -667,191 +1356,385 @@ input:focus-visible {
 }
 
 #mapInfoTitle {
-  margin: 0 28px 5px 0;
+  margin:
+    0
+    28px
+    6px
+    0;
 
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 18px;
-  font-weight: 500;
+  color:
+    var(--foreground-strong);
+
+  font-family:
+    var(--font-serif);
+
+  font-size:
+    var(--text-xl);
+
+  font-weight:
+    500;
+
+  line-height:
+    var(--line-tight);
+
+  letter-spacing:
+    -0.01em;
 }
 
 #mapInfoContent {
-  color: var(--text-soft);
-  font-size: 12px;
-  line-height: 1.65;
+  color:
+    var(--foreground-muted);
+
+  font-size:
+    var(--text-sm);
+
+  line-height:
+    var(--line-relaxed);
+}
+
+#mapInfoContent strong {
+  color:
+    var(--foreground);
+  font-weight:
+    500;
+}
+
+#mapInfoContent code {
+  color:
+    var(--foreground);
+
+  font-family:
+    var(--font-mono);
+
+  font-size:
+    11px;
 }
 
 #closeMapInfo {
   position: absolute;
 
-  top: 9px;
-  right: 9px;
+  top: 10px;
+  right: 10px;
 
-  width: 27px;
-  height: 27px;
+  width: 28px;
+  height: 28px;
 
   display: grid;
   place-items: center;
 
-  color: var(--text-muted);
-  background: transparent;
+  color:
+    var(--foreground-subtle);
 
-  border-radius: 5px;
+  background:
+    transparent;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    var(--radius-sm);
 
   cursor: pointer;
 }
 
 #closeMapInfo:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.06);
+  color:
+    var(--foreground);
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  border-color:
+    var(--border);
 }
 
-/* =========================================================
-   LOADING / ERROR
-   ========================================================= */
 
-#loading,
-#error {
+/* ==========================================================================
+   19. LOADING STATE
+   ========================================================================== */
+
+#loading {
   position: absolute;
+
   inset: 0;
 
-  z-index: 30;
+  z-index: 25;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: rgba(11, 13, 12, 0.84);
+  background:
+    rgba(17, 20, 19, 0.92);
 
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter:
+    blur(4px);
+
+  -webkit-backdrop-filter:
+    blur(4px);
 }
 
-#loading[hidden],
-#error[hidden] {
+#loading[hidden] {
   display: none;
 }
 
-.loading-inner,
-.error-inner {
-  max-width: 420px;
-  padding: 28px;
+.loading-inner {
+  width: min(320px, calc(100% - 40px));
 
   text-align: center;
 }
 
-.loading-title,
-.error-title {
-  margin-bottom: 7px;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 17px;
-}
-
-.loading-text,
-.error-text {
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
 .loading-spinner {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
 
-  margin: 0 auto 14px;
+  margin:
+    0 auto
+    var(--space-4);
 
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--accent);
+  border:
+    2px solid rgba(255, 255, 255, 0.1);
 
-  border-radius: 50%;
+  border-top-color:
+    var(--foreground);
 
-  animation: spin 800ms linear infinite;
+  border-radius:
+    50%;
+
+  animation:
+    atlas-spin
+    700ms linear infinite;
 }
 
-/* =========================================================
-   TIMELINE
-   ========================================================= */
+.loading-title {
+  margin-bottom:
+    var(--space-1);
+
+  color:
+    var(--foreground);
+
+  font-size:
+    var(--text-sm);
+
+  font-weight:
+    500;
+}
+
+.loading-text {
+  color:
+    var(--foreground-subtle);
+
+  font-size:
+    var(--text-xs);
+}
+
+
+/* ==========================================================================
+   20. ERROR STATE
+   ========================================================================== */
+
+#error {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 25;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    rgba(17, 20, 19, 0.94);
+}
+
+#error[hidden] {
+  display: none;
+}
+
+.error-inner {
+  width:
+    min(440px, calc(100% - 40px));
+
+  padding:
+    var(--space-6);
+
+  text-align:
+    center;
+}
+
+.error-title {
+  margin-bottom:
+    var(--space-2);
+
+  color:
+    var(--foreground-strong);
+
+  font-size:
+    var(--text-lg);
+
+  font-weight:
+    550;
+}
+
+.error-text {
+  color:
+    var(--foreground-subtle);
+
+  font-size:
+    var(--text-sm);
+
+  line-height:
+    var(--line-relaxed);
+}
+
+
+/* ==========================================================================
+   21. TIMELINE
+   ========================================================================== */
 
 #timelinePanel {
   position: relative;
-  z-index: 40;
 
-  height: var(--timeline-height);
+  z-index: var(--z-timeline);
 
-  padding: 15px 22px 18px;
+  height:
+    var(--timeline-height);
+
+  padding:
+    var(--space-4)
+    var(--space-6)
+    var(--space-5);
 
   background:
-    linear-gradient(
-      180deg,
-      rgba(18, 21, 19, 0.98),
-      rgba(13, 15, 14, 0.98)
-    );
+    var(--surface);
 
-  border-top: 1px solid var(--border);
+  border-top:
+    1px solid var(--border);
 
-  box-shadow: 0 -12px 35px rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 -8px 24px rgba(0, 0, 0, 0.12);
 }
+
+
+/* --------------------------------------------------------------------------
+   Timeline header
+   -------------------------------------------------------------------------- */
 
 .timeline-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 12px;
+  min-height: 30px;
+
+  margin-bottom:
+    var(--space-3);
 }
 
 .timeline-title {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+
+  gap:
+    var(--space-3);
 }
 
 .timeline-title h2 {
   margin: 0;
 
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 14px;
-  font-weight: 500;
+  color:
+    var(--foreground);
+
+  font-size:
+    var(--text-sm);
+
+  font-weight:
+    550;
+
+  letter-spacing:
+    -0.005em;
 }
 
 #timelineYearLabel {
-  color: var(--accent);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 13px;
+  color:
+    var(--foreground-subtle);
+
+  font-family:
+    var(--font-mono);
+
+  font-size:
+    10px;
 }
+
+
+/* --------------------------------------------------------------------------
+   Timeline actions
+   -------------------------------------------------------------------------- */
 
 .timeline-actions {
   display: flex;
-  gap: 5px;
+  align-items: center;
+
+  gap:
+    var(--space-1);
 }
 
 .timeline-button {
-  min-width: 31px;
-  height: 29px;
+  min-width:
+    32px;
 
-  padding: 0 9px;
+  height:
+    30px;
 
-  border-radius: 6px;
+  padding:
+    0
+    9px;
 
-  font-size: 12px;
+  font-size:
+    var(--text-sm);
+
+  background:
+    rgba(255, 255, 255, 0.035);
 }
 
 #playButton {
-  min-width: 68px;
-  color: var(--accent-bright);
-  border-color: rgba(201, 169, 110, 0.22);
-  background: rgba(201, 169, 110, 0.07);
+  min-width:
+    64px;
+
+  color:
+    var(--foreground);
+
+  background:
+    rgba(255, 255, 255, 0.055);
+
+  border-color:
+    var(--border-strong);
 }
 
-/* =========================================================
-   RANGE SLIDER
-   ========================================================= */
+#playButton:hover {
+  background:
+    rgba(255, 255, 255, 0.09);
+}
+
+
+/* ==========================================================================
+   22. TIMELINE TRACK
+   ========================================================================== */
 
 .timeline-track {
   position: relative;
-  padding: 5px 0;
+
+  width: 100%;
+
+  padding:
+    5px
+    0;
 }
 
 #timeline {
+  display: block;
+
   width: 100%;
   height: 22px;
 
@@ -865,505 +1748,1222 @@ input:focus-visible {
   cursor: pointer;
 }
 
-/* WebKit */
+#timeline:focus-visible {
+  outline: none;
+}
+
+
+/* --------------------------------------------------------------------------
+   WebKit
+   -------------------------------------------------------------------------- */
 
 #timeline::-webkit-slider-runnable-track {
+  width: 100%;
   height: 3px;
 
   background:
-    linear-gradient(
-      90deg,
-      var(--accent),
-      rgba(201, 169, 110, 0.3)
-    );
+    rgba(255, 255, 255, 0.12);
 
-  border-radius: 99px;
+  border-radius:
+    var(--radius-full);
 }
 
 #timeline::-webkit-slider-thumb {
   appearance: none;
   -webkit-appearance: none;
 
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
 
-  margin-top: -6px;
+  margin-top: -5.5px;
 
-  background: var(--accent-bright);
+  background:
+    var(--foreground-strong);
 
-  border: 3px solid var(--bg-elevated);
-  border-radius: 50%;
+  border:
+    3px solid var(--surface);
+
+  border-radius:
+    50%;
 
   box-shadow:
-    0 0 0 1px rgba(201, 169, 110, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+#timeline:hover::-webkit-slider-thumb {
+  transform:
+    scale(1.12);
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.5),
     0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Firefox */
+
+/* --------------------------------------------------------------------------
+   Firefox
+   -------------------------------------------------------------------------- */
 
 #timeline::-moz-range-track {
+  width: 100%;
   height: 3px;
 
   background:
-    linear-gradient(
-      90deg,
-      var(--accent),
-      rgba(201, 169, 110, 0.3)
-    );
+    rgba(255, 255, 255, 0.12);
 
-  border-radius: 99px;
+  border-radius:
+    var(--radius-full);
+}
+
+#timeline::-moz-range-progress {
+  height: 3px;
+
+  background:
+    var(--foreground-muted);
+
+  border-radius:
+    var(--radius-full);
 }
 
 #timeline::-moz-range-thumb {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
 
-  background: var(--accent-bright);
+  background:
+    var(--foreground-strong);
 
-  border: 3px solid var(--bg-elevated);
-  border-radius: 50%;
+  border:
+    3px solid var(--surface);
+
+  border-radius:
+    50%;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
-/* =========================================================
-   TIMELINE TICKS
-   ========================================================= */
+
+/* ==========================================================================
+   23. TIMELINE TICKS
+   ========================================================================== */
 
 #timelineTicks {
   position: relative;
 
-  height: 15px;
+  width: 100%;
+  height: 20px;
 
-  margin-top: -1px;
+  margin-top:
+    -1px;
 }
 
 .timeline-tick {
   position: absolute;
+
   top: 0;
 
   width: 1px;
   height: 5px;
 
-  background: rgba(255, 255, 255, 0.18);
+  background:
+    rgba(255, 255, 255, 0.12);
 }
 
 .timeline-tick.major {
   height: 8px;
-  background: rgba(201, 169, 110, 0.55);
+
+  background:
+    rgba(255, 255, 255, 0.28);
 }
 
 .timeline-tick-label {
   position: absolute;
-  top: 9px;
 
-  transform: translateX(-50%);
+  top: 10px;
 
-  color: var(--text-muted);
-  font-size: 9px;
+  transform:
+    translateX(-50%);
 
-  white-space: nowrap;
+  color:
+    var(--foreground-subtle);
+
+  font-family:
+    var(--font-mono);
+
+  font-size:
+    9px;
+
+  white-space:
+    nowrap;
 }
 
-/* =========================================================
-   TIMELINE LABELS
-   ========================================================= */
+
+/* ==========================================================================
+   24. TIMELINE QUICK PERIODS
+   ========================================================================== */
 
 #timelineLabels {
   display: flex;
   align-items: center;
-  justify-content: space-between;
 
-  margin-top: 12px;
+  gap:
+    var(--space-1);
+
+  margin-top:
+    var(--space-3);
+
+  overflow-x: auto;
+
+  scrollbar-width: none;
+}
+
+#timelineLabels::-webkit-scrollbar {
+  display: none;
 }
 
 .timeline-period {
-  padding: 4px 7px;
+  flex:
+    0 0 auto;
 
-  color: var(--text-muted);
+  height:
+    28px;
 
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 5px;
+  padding:
+    0
+    9px;
 
-  font-size: 10px;
+  color:
+    var(--foreground-subtle);
 
-  cursor: pointer;
+  background:
+    transparent;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    var(--radius-sm);
+
+  font-family:
+    var(--font-mono);
+
+  font-size:
+    9px;
+
+  cursor:
+    pointer;
 
   transition:
-    color 140ms ease,
-    background 140ms ease,
-    border-color 140ms ease;
+    color var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out);
 }
 
 .timeline-period:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--border);
+  color:
+    var(--foreground);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border-color:
+    var(--border);
+}
+
+.timeline-period:active {
+  background:
+    rgba(255, 255, 255, 0.07);
 }
 
 .timeline-period.active {
-  color: var(--accent-bright);
-  background: var(--accent-soft);
-  border-color: rgba(201, 169, 110, 0.18);
+  color:
+    var(--foreground-strong);
+
+  background:
+    rgba(255, 255, 255, 0.07);
+
+  border-color:
+    var(--border-strong);
 }
 
-/* =========================================================
-   FOOTER
-   ========================================================= */
+
+/* ==========================================================================
+   25. FOOTER / MAP STATUS
+   ========================================================================== */
 
 .atlas-footer {
   position: absolute;
 
-  bottom: 7px;
-  right: 12px;
+  right:
+    var(--space-3);
 
-  z-index: 12;
+  bottom:
+    var(--space-2);
 
-  color: rgba(255, 255, 255, 0.32);
+  z-index:
+    var(--z-map-controls);
 
-  font-size: 9px;
-  letter-spacing: 0.04em;
+  color:
+    rgba(255, 255, 255, 0.28);
 
-  pointer-events: none;
+  font-family:
+    var(--font-mono);
+
+  font-size:
+    9px;
+
+  pointer-events:
+    none;
+
+  user-select:
+    none;
 }
 
-/* =========================================================
-   ABOUT MODAL
-   ========================================================= */
+
+/* ==========================================================================
+   26. ABOUT MODAL
+   ========================================================================== */
 
 #aboutModal {
   position: fixed;
+
   inset: 0;
 
-  z-index: 100;
+  z-index:
+    var(--z-modal);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding: 20px;
+  padding:
+    var(--space-5);
 
-  background: rgba(0, 0, 0, 0.68);
+  background:
+    rgba(0, 0, 0, 0.72);
 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter:
+    blur(8px);
 
-  animation: fade-in 160ms ease;
+  -webkit-backdrop-filter:
+    blur(8px);
+
+  animation:
+    atlas-fade-in
+    var(--duration-normal)
+    var(--ease-out);
 }
 
 #aboutModal[hidden] {
   display: none;
 }
 
+
+/* --------------------------------------------------------------------------
+   About card
+   -------------------------------------------------------------------------- */
+
 .about-card {
   position: relative;
 
-  width: min(560px, 100%);
+  width:
+    min(560px, 100%);
 
-  padding: 30px;
+  max-height:
+    min(700px, calc(100vh - 40px));
+
+  padding:
+    var(--space-8);
+
+  overflow-y:
+    auto;
 
   background:
-    linear-gradient(
-      145deg,
-      rgba(26, 29, 26, 0.98),
-      rgba(14, 17, 15, 0.98)
-    );
+    var(--surface-raised);
 
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-lg);
+  border:
+    1px solid var(--border-strong);
 
-  box-shadow: var(--shadow-lg);
+  border-radius:
+    var(--radius-xl);
+
+  box-shadow:
+    var(--shadow-lg);
+
+  animation:
+    atlas-modal-enter
+    var(--duration-slow)
+    var(--ease-out);
 }
 
 .about-card h2 {
-  margin: 0 0 7px;
+  margin:
+    0 0
+    var(--space-2);
 
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 25px;
-  font-weight: 500;
+  color:
+    var(--foreground-strong);
+
+  font-family:
+    var(--font-serif);
+
+  font-size:
+    var(--text-3xl);
+
+  font-weight:
+    500;
+
+  line-height:
+    var(--line-tight);
+
+  letter-spacing:
+    -0.02em;
 }
 
 .about-card .subtitle {
-  margin-bottom: 22px;
+  margin-bottom:
+    var(--space-6);
 
-  color: var(--accent);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  color:
+    var(--foreground-subtle);
+
+  font-family:
+    var(--font-mono);
+
+  font-size:
+    9px;
+
+  letter-spacing:
+    0.08em;
+
+  text-transform:
+    uppercase;
 }
 
 .about-card p {
-  margin: 0 0 14px;
+  margin:
+    0 0
+    var(--space-4);
 
-  color: var(--text-soft);
-  font-size: 13px;
-  line-height: 1.75;
+  color:
+    var(--foreground-muted);
+
+  font-size:
+    var(--text-sm);
+
+  line-height:
+    1.75;
+}
+
+.about-card p:last-child {
+  margin-bottom:
+    0;
 }
 
 .about-close {
   position: absolute;
-  top: 13px;
-  right: 13px;
 
-  width: 32px;
-  height: 32px;
+  top:
+    var(--space-3);
 
-  display: grid;
-  place-items: center;
+  right:
+    var(--space-3);
 
-  color: var(--text-muted);
-  background: transparent;
+  width:
+    32px;
 
-  border-radius: 6px;
+  height:
+    32px;
 
-  cursor: pointer;
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  color:
+    var(--foreground-subtle);
+
+  background:
+    transparent;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    var(--radius-sm);
+
+  cursor:
+    pointer;
+
+  transition:
+    color var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out);
 }
 
 .about-close:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.06);
+  color:
+    var(--foreground);
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  border-color:
+    var(--border);
 }
 
-/* =========================================================
-   SCROLLBARS
-   ========================================================= */
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+/* ==========================================================================
+   27. UTILITY STATES
+   ========================================================================== */
+
+.is-hidden,
+[hidden] {
+  display: none !important;
 }
 
-/* =========================================================
-   ANIMATIONS
-   ========================================================= */
+.is-disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+.is-loading {
+  pointer-events: none;
+}
+
+
+/* ==========================================================================
+   28. DATA / CODE TYPOGRAPHY
+   ========================================================================== */
+
+code,
+pre,
+.mono {
+  font-family:
+    var(--font-mono);
+}
+
+pre {
+  overflow-x: auto;
+
+  padding:
+    var(--space-4);
+
+  color:
+    var(--foreground-muted);
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-md);
+}
+
+
+/* ==========================================================================
+   29. MOBILE NAV / TOUCH TARGET FOUNDATION
+   ========================================================================== */
+
+@media (pointer: coarse) {
+  .header-button,
+  .map-button,
+  .timeline-button,
+  .icon-button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .entity-item {
+    min-height: 44px;
+  }
+
+  .timeline-period {
+    min-height: 36px;
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
+
+/* ==========================================================================
+   30. LARGE DESKTOP
+   ========================================================================== */
+
+@media (min-width: 1440px) {
+  :root {
+    --sidebar-width: 300px;
   }
 
-  to {
-    opacity: 1;
+  .atlas-header {
+    padding-left:
+      var(--space-5);
+
+    padding-right:
+      var(--space-5);
+  }
+
+  #timelinePanel {
+    padding-left:
+      var(--space-8);
+
+    padding-right:
+      var(--space-8);
   }
 }
 
-@keyframes panel-in {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ==========================================================================
+   31. TABLET
+   ========================================================================== */
 
-/* =========================================================
-   RESPONSIVE — TABLET
-   ========================================================= */
-
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   :root {
     --sidebar-width: 250px;
-    --timeline-height: 150px;
   }
 
   .atlas-brand {
-    min-width: auto;
+    min-width: 180px;
+  }
+
+  .atlas-header-actions {
+    min-width: 180px;
+  }
+
+  #timelinePanel {
+    padding-left:
+      var(--space-4);
+
+    padding-right:
+      var(--space-4);
+  }
+}
+
+
+/* ==========================================================================
+   32. SMALL TABLET
+   ========================================================================== */
+
+@media (max-width: 760px) {
+  :root {
+    --sidebar-width: 220px;
+    --timeline-height: 168px;
   }
 
   .atlas-brand span {
     display: none;
   }
 
-  #timelinePanel {
-    padding-left: 16px;
-    padding-right: 16px;
+  .atlas-brand {
+    min-width: auto;
   }
 
-  .timeline-period {
-    padding-left: 4px;
-    padding-right: 4px;
-  }
-}
-
-/* =========================================================
-   RESPONSIVE — MOBILE
-   ========================================================= */
-
-@media (max-width: 680px) {
-  body {
-    overflow: auto;
-  }
-
-  .atlas-app {
-    min-height: 100vh;
-    height: auto;
-
-    grid-template-rows: 54px auto auto;
-  }
-
-  .atlas-header {
-    height: 54px;
-    padding: 0 12px;
-  }
-
-  .atlas-brand h1 {
-    font-size: 15px;
-  }
-
-  .atlas-brand-mark {
-    width: 27px;
-    height: 27px;
+  .atlas-header-actions {
+    min-width: auto;
   }
 
   .atlas-year {
-    position: static;
-    transform: none;
-
-    margin-left: auto;
-    margin-right: 9px;
-
-    font-size: 15px;
-  }
-
-  .header-button {
-    width: 34px;
-    padding: 0;
-
-    font-size: 0;
-  }
-
-  .header-button::after {
-    content: "⋯";
-    font-size: 17px;
-  }
-
-  .atlas-main {
-    min-height: 0;
-
-    display: flex;
-    flex-direction: column;
-  }
-
-  #sidebar {
-    order: 2;
-
-    height: 190px;
-
-    border-right: 0;
-    border-top: 1px solid var(--border);
-  }
-
-  #map {
-    order: 1;
-
-    height: 58vh;
-    min-height: 390px;
+    font-size:
+      var(--text-md);
   }
 
   .sidebar-top {
-    padding: 10px 12px;
-  }
-
-  #entityList {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-content: start;
-  }
-
-  .entity-item {
-    margin: 0;
+    padding:
+      var(--space-3);
   }
 
   .border-legend {
-    display: none;
-  }
-
-  #timelinePanel {
-    height: auto;
-    min-height: 142px;
-
-    padding: 12px 12px 14px;
-  }
-
-  .timeline-header {
-    margin-bottom: 8px;
-  }
-
-  #timelineLabels {
-    overflow-x: auto;
-    justify-content: flex-start;
-    gap: 3px;
-
-    padding-bottom: 2px;
-  }
-
-  .timeline-period {
-    flex-shrink: 0;
-  }
-
-  .atlas-footer {
-    display: none;
+    padding:
+      var(--space-3);
   }
 }
 
-/* =========================================================
-   VERY SMALL SCREENS
-   ========================================================= */
 
-@media (max-width: 430px) {
-  #map {
-    min-height: 340px;
+/* ==========================================================================
+   33. MOBILE
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  :root {
+    --mobile-header-height: 52px;
+    --timeline-height: auto;
+  }
+
+  body {
+    overflow:
+      hidden;
+  }
+
+  .atlas-app {
+    height:
+      100dvh;
+
+    grid-template-rows:
+      var(--mobile-header-height)
+      minmax(0, 1fr);
+  }
+
+  /* ------------------------------------------------------------------------
+     Header
+     ------------------------------------------------------------------------ */
+
+  .atlas-header {
+    height:
+      var(--mobile-header-height);
+
+    padding:
+      0
+      var(--space-3);
+  }
+
+  .atlas-brand {
+    gap:
+      var(--space-2);
+  }
+
+  .atlas-brand-mark {
+    width:
+      26px;
+
+    height:
+      26px;
+
+    flex-basis:
+      26px;
   }
 
   .atlas-brand h1 {
-    font-size: 14px;
+    font-size:
+      var(--text-sm);
   }
 
   .atlas-year {
-    font-size: 13px;
+    position:
+      static;
+
+    transform:
+      none;
+
+    margin-left:
+      auto;
+
+    margin-right:
+      var(--space-2);
+
+    font-size:
+      var(--text-sm);
   }
 
-  #mapInfo {
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-
-    width: auto;
+  .atlas-header-actions {
+    gap:
+      var(--space-1);
   }
+
+  .header-button {
+    width:
+      34px;
+
+    min-width:
+      34px;
+
+    padding:
+      0;
+
+    font-size:
+      0;
+  }
+
+  .header-button::after {
+    content:
+      "•••";
+
+    font-size:
+      10px;
+
+    letter-spacing:
+      2px;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     Main
+     ------------------------------------------------------------------------ */
+
+  .atlas-main {
+    min-height:
+      0;
+
+    display:
+      flex;
+
+    flex-direction:
+      column;
+
+    overflow:
+      hidden;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     Map
+     ------------------------------------------------------------------------ */
+
+  #map {
+    order:
+      1;
+
+    flex:
+      1 1 auto;
+
+    min-height:
+      0;
+
+    width:
+      100%;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     Sidebar
+     ------------------------------------------------------------------------ */
+
+  #sidebar {
+    order:
+      2;
+
+    flex:
+      0 0 172px;
+
+    width:
+      100%;
+
+    height:
+      172px;
+
+    min-height:
+      172px;
+
+    border:
+      0;
+
+    border-top:
+      1px solid var(--border);
+
+    box-shadow:
+      0 -8px 24px rgba(0, 0, 0, 0.16);
+  }
+
+  .sidebar-top {
+    padding:
+      var(--space-2)
+      var(--space-3);
+  }
+
+  .sidebar-heading {
+    margin-bottom:
+      var(--space-2);
+  }
+
+  .sidebar-heading h2 {
+    font-size:
+      var(--text-sm);
+  }
+
+  #search {
+    height:
+      34px;
+  }
+
+  .sidebar-meta {
+    display:
+      none;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     Mobile entity list
+     ------------------------------------------------------------------------ */
+
+  #entityList {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    align-content:
+      start;
+
+    gap:
+      2px;
+
+    padding:
+      var(--space-2);
+
+    overflow-y:
+      auto;
+  }
+
+  .entity-item {
+    min-width:
+      0;
+
+    padding:
+      8px;
+
+    min-height:
+      42px;
+  }
+
+  .entity-name {
+    font-size:
+      11px;
+  }
+
+  .entity-meta {
+    font-size:
+      8px;
+  }
+
+  .border-legend {
+    display:
+      none;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     Map controls
+     ------------------------------------------------------------------------ */
 
   .map-controls {
-    top: 10px;
-    right: 10px;
+    top:
+      var(--space-3);
+
+    right:
+      var(--space-3);
+  }
+
+
+  /* ------------------------------------------------------------------------
+     Map info
+     ------------------------------------------------------------------------ */
+
+  #mapInfo {
+    left:
+      var(--space-3);
+
+    right:
+      var(--space-3);
+
+    bottom:
+      var(--space-3);
+
+    width:
+      auto;
+
+    padding:
+      var(--space-4);
+  }
+
+
+  /* ------------------------------------------------------------------------
+     Timeline
+     ------------------------------------------------------------------------ */
+
+  #timelinePanel {
+    position:
+      relative;
+
+    height:
+      auto;
+
+    min-height:
+      150px;
+
+    padding:
+      var(--space-3);
+
+    border-top:
+      1px solid var(--border);
+  }
+
+  .timeline-header {
+    margin-bottom:
+      var(--space-2);
+  }
+
+  .timeline-title {
+    gap:
+      var(--space-2);
   }
 
   .timeline-actions {
-    gap: 3px;
+    gap:
+      2px;
   }
 
   .timeline-button {
-    min-width: 28px;
-    padding: 0 7px;
+    min-width:
+      32px;
+
+    height:
+      32px;
+
+    padding:
+      0
+      8px;
+  }
+
+  #playButton {
+    min-width:
+      58px;
+  }
+
+  #timelineLabels {
+    margin-top:
+      var(--space-2);
+
+    padding-bottom:
+      2px;
+  }
+
+  .timeline-period {
+    height:
+      30px;
+  }
+
+  .timeline-tick-label {
+    display:
+      none;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     Footer
+     ------------------------------------------------------------------------ */
+
+  .atlas-footer {
+    display:
+      none;
   }
 }
 
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
+
+/* ==========================================================================
+   34. VERY SMALL MOBILE
+   ========================================================================== */
+
+@media (max-width: 420px) {
+  .atlas-header {
+    padding:
+      0
+      10px;
+  }
+
+  .atlas-brand h1 {
+    font-size:
+      12px;
+  }
+
+  .atlas-brand-mark {
+    width:
+      24px;
+
+    height:
+      24px;
+
+    flex-basis:
+      24px;
+  }
+
+  .atlas-year {
+    font-size:
+      12px;
+  }
+
+  #sidebar {
+    flex-basis:
+      158px;
+
+    height:
+      158px;
+
+    min-height:
+      158px;
+  }
+
+  #timelinePanel {
+    min-height:
+      144px;
+  }
+
+  .timeline-title h2 {
+    font-size:
+      11px;
+  }
+
+  #timelineYearLabel {
+    font-size:
+      9px;
+  }
+
+  .timeline-period {
+    padding-left:
+      7px;
+
+    padding-right:
+      7px;
+  }
+}
+
+
+/* ==========================================================================
+   35. LANDSCAPE MOBILE
+   ========================================================================== */
+
+@media (max-width: 760px) and (orientation: landscape) {
+  #sidebar {
+    flex-basis:
+      118px;
+
+    height:
+      118px;
+
+    min-height:
+      118px;
+  }
+
+  .sidebar-top {
+    padding:
+      6px
+      10px;
+  }
+
+  .sidebar-heading {
+    display:
+      none;
+  }
+
+  #entityList {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+  }
+
+  .entity-item {
+    min-height:
+      36px;
+
+    padding:
+      6px;
+  }
+
+  .entity-meta {
+    display:
+      none;
+  }
+
+  #timelinePanel {
+    min-height:
+      125px;
+
+    padding:
+      9px
+      12px;
+  }
+}
+
+
+/* ==========================================================================
+   36. REDUCED MOTION
+   ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    scroll-behavior:
+      auto !important;
+
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.01ms !important;
+  }
+}
+
+
+/* ==========================================================================
+   37. ANIMATIONS
+   ========================================================================== */
+
+@keyframes atlas-spin {
+  from {
+    transform:
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+@keyframes atlas-fade-in {
+  from {
+    opacity:
+      0;
+  }
+
+  to {
+    opacity:
+      1;
+  }
+}
+
+@keyframes atlas-panel-enter {
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(5px);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes atlas-modal-enter {
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(8px)
+      scale(0.99);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(0)
+      scale(1);
   }
 }
