@@ -111,6 +111,7 @@
     mapLayer: null,
     borderLayer: null,
     placeLayer: null,
+    zoom: null,
 
     // Leaflet slippy-map view
     leaflet: {
@@ -541,24 +542,21 @@
       );
     }
 
-    const rect = mapElement.getBoundingClientRect();
-
-    const width =
-      rect.width ||
-      CONFIG.width;
-
-    const height =
-      rect.height ||
-      CONFIG.height;
-
     state.svg = d3
       .select(mapElement)
       .append("svg")
       .attr("class", "atlas-svg")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", `0 0 ${width} ${height}`)
-      .attr("preserveAspectRatio", "xMidYMid meet");
+      .attr(
+        "viewBox",
+        `0 0 ${CONFIG.width} ${CONFIG.height}`
+      )
+      .attr(
+        "preserveAspectRatio",
+        "xMidYMid meet"
+      );
+
+    const width = CONFIG.width;
+    const height = CONFIG.height;
 
     state.mapLayer = state.svg
       .append("g")
@@ -571,6 +569,110 @@
     state.placeLayer = state.svg
       .append("g")
       .attr("class", "atlas-place-layer");
+
+    /*
+      Zoom + pan on the flat atlas.
+      The zoom buttons in the HTML dispatch
+      "atlas:zoom" CustomEvents; we also wire
+      wheel/drag zoom directly through D3.
+    */
+
+    const zoom = d3
+      .zoom()
+      .scaleExtent([1, 12])
+      .filter(() => {
+        /*
+          Only start wheel/drag zoom gestures from
+          empty map space so region hover and click
+          interactions keep working.
+        */
+
+        const event = d3.event;
+
+        if (!event) {
+          return true;
+        }
+
+        if (event.type === "wheel") {
+          return true;
+        }
+
+        if (
+          event.target &&
+          event.target.closest &&
+          event.target.closest(
+            ".historical-region, .historical-place"
+          )
+        ) {
+          return false;
+        }
+
+        return !event.button;
+      })
+      .on("zoom", () => {
+        const transform = d3.event
+          ? d3.event.transform
+          : null;
+
+        if (!transform) {
+          return;
+        }
+
+        [
+          state.mapLayer,
+          state.borderLayer,
+          state.placeLayer
+        ].forEach(layer => {
+          if (layer) {
+            layer.attr(
+              "transform",
+              transform
+            );
+          }
+        });
+      });
+
+    state.zoom = zoom;
+    state.svg.call(zoom);
+
+    window.addEventListener(
+      "atlas:zoom",
+      event => {
+
+        const detail =
+          (event && event.detail) || {};
+
+        if (
+          detail.direction === "in"
+        ) {
+          state.svg
+            .transition()
+            .duration(250)
+            .call(zoom.scaleBy, 1.5);
+        }
+
+        if (
+          detail.direction === "out"
+        ) {
+          state.svg
+            .transition()
+            .duration(250)
+            .call(zoom.scaleBy, 1 / 1.5);
+        }
+
+        if (
+          detail.direction === "reset"
+        ) {
+          state.svg
+            .transition()
+            .duration(350)
+            .call(
+              zoom.transform,
+              d3.zoomIdentity
+            );
+        }
+      }
+    );
 
     /*
       Natural Earth is a good default for a world historical atlas.
@@ -635,10 +737,6 @@
       .scale(
         Math.min(width, height) * 0.31
       );
-
-    state.path = d3
-      .geoPath()
-      .projection(state.projection);
 
     renderMap();
   }
@@ -883,37 +981,8 @@
     renderLeafletPlaces();
     renderGlobePlaces();
 
-    const features =
-      state.places.features || [];
-
-    const currentYear =
-      state.currentYear;
-
     const visiblePlaces =
-      features.filter(feature => {
-
-        const props =
-          feature.properties || {};
-
-        const since =
-          Number.isFinite(
-            Number(props.inhabitedSince)
-          )
-            ? Number(props.inhabitedSince)
-            : -Infinity;
-
-        const until =
-          Number.isFinite(
-            Number(props.inhabitedUntil)
-          )
-            ? Number(props.inhabitedUntil)
-            : Infinity;
-
-        return (
-          currentYear >= since &&
-          currentYear <= until
-        );
-      });
+      getVisiblePlaces();
 
     const places =
       state.placeLayer
@@ -1040,16 +1109,13 @@
      FEATURE INTERACTION
      ---------------------------------------------------------- */
 
-  function handleFeatureEnter(event, feature) {
-    const name =
-      getFeatureName(feature);
-
+  function handleFeatureEnter(feature) {
     showTooltip(
-      event,
+      d3.event,
       createFeatureTooltip(feature)
     );
 
-    d3.select(event.currentTarget)
+    d3.select(this)
       .classed(
         "hovered",
         true
@@ -1057,15 +1123,15 @@
   }
 
 
-  function handleFeatureMove(event) {
-    moveTooltip(event);
+  function handleFeatureMove() {
+    moveTooltip(d3.event);
   }
 
 
-  function handleFeatureLeave(event) {
+  function handleFeatureLeave() {
     hideTooltip();
 
-    d3.select(event.currentTarget)
+    d3.select(this)
       .classed(
         "hovered",
         false
@@ -1073,20 +1139,14 @@
   }
 
 
-  function handleFeatureClick(event, feature) {
-    event.stopPropagation();
+  function handleFeatureClick(feature) {
+    if (d3.event) {
+      d3.event.stopPropagation();
+    }
 
-    const name =
-      getFeatureName(feature);
-
-    state.selectedEntity =
-      state.selectedEntity === name
-        ? null
-        : name;
-
-    renderMap();
-
-    updateEntityList();
+    selectEntityByName(
+      getFeatureName(feature)
+    );
   }
 
 
@@ -1094,12 +1154,12 @@
      PLACE INTERACTION
      ---------------------------------------------------------- */
 
-  function handlePlaceEnter(event, feature) {
+  function handlePlaceEnter(feature) {
     const props =
       feature.properties || {};
 
     showTooltip(
-      event,
+      d3.event,
       `
         <strong>${escapeHtml(
           props.name || "Unknown place"
@@ -1109,7 +1169,7 @@
       `
     );
 
-    moveTooltip(event);
+    moveTooltip(d3.event);
   }
 
 
@@ -2227,19 +2287,37 @@
       const props =
         feature.properties || {};
 
+      /*
+        The dataset currently stores inhabitedSince /
+        inhabitedUntil as null for most settlements.
+        Number(null) is 0, which would wrongly hide
+        them from nearly every year — treat missing
+        values as unbounded instead.
+      */
+
+      const rawSince =
+        props.inhabitedSince;
+
+      const rawUntil =
+        props.inhabitedUntil;
+
       const since =
-        Number.isFinite(
-          Number(props.inhabitedSince)
-        )
-          ? Number(props.inhabitedSince)
-          : -Infinity;
+        rawSince === null ||
+        rawSince === undefined ||
+        rawSince === ""
+          ? -Infinity
+          : Number.isFinite(Number(rawSince))
+            ? Number(rawSince)
+            : -Infinity;
 
       const until =
-        Number.isFinite(
-          Number(props.inhabitedUntil)
-        )
-          ? Number(props.inhabitedUntil)
-          : Infinity;
+        rawUntil === null ||
+        rawUntil === undefined ||
+        rawUntil === ""
+          ? Infinity
+          : Number.isFinite(Number(rawUntil))
+            ? Number(rawUntil)
+            : Infinity;
 
       return (
         currentYear >= since &&
@@ -2293,9 +2371,15 @@
 
     state.globe.projection = projection;
 
+    /*
+      pointRadius must be an accessor (not a constant)
+      so d3 v5 forwards the feature datum to it.
+    */
+
     state.globe.path = d3
       .geoPath()
-      .projection(projection);
+      .projection(projection)
+      .pointRadius(() => 3);
 
     const svg = d3
       .select(globeElement)
@@ -2338,7 +2422,13 @@
         state.globe.dragging = true;
         stopGlobeAutoRotate();
       })
-      .on("drag", event => {
+      .on("drag", () => {
+        const event = d3.event;
+
+        if (!event) {
+          return;
+        }
+
         const rotate =
           state.globe.projection.rotate();
 
@@ -2445,8 +2535,11 @@
       .on("mouseenter", handleFeatureEnter)
       .on("mousemove", handleFeatureMove)
       .on("mouseleave", handleFeatureLeave)
-      .on("click", (event, feature) => {
-        event.stopPropagation();
+      .on("click", function(feature) {
+        if (d3.event) {
+          d3.event.stopPropagation();
+        }
+
         selectEntityByName(
           getFeatureName(feature)
         );
@@ -2691,7 +2784,90 @@
 
     renderMap();
     updateEntityList();
+    updateMapInfoPanel();
     updateURLState();
+  }
+
+
+  function updateMapInfoPanel() {
+    const panel = $("#mapInfo");
+
+    if (!panel) {
+      return;
+    }
+
+    const title = $("#mapInfoTitle");
+    const content = $("#mapInfoContent");
+
+    if (!state.selectedEntity) {
+      panel.classList.remove("visible");
+      return;
+    }
+
+    if (title) {
+      title.textContent = state.selectedEntity;
+    }
+
+    if (content) {
+      const feature =
+        state.currentFeatures.find(
+          candidate =>
+            getFeatureName(candidate) ===
+            state.selectedEntity
+        );
+
+      const props =
+        (feature && feature.properties) || {};
+
+      const rows = [];
+
+      rows.push(
+        `<div>${escapeHtml(
+          formatYear(state.currentYear)
+        )}</div>`
+      );
+
+      if (
+        props.SUBJECTO &&
+        props.SUBJECTO !== state.selectedEntity
+      ) {
+        rows.push(
+          `<div>Authority: ${escapeHtml(
+            props.SUBJECTO
+          )}</div>`
+        );
+      }
+
+      if (props.PARTOF) {
+        rows.push(
+          `<div>Part of: ${escapeHtml(
+            props.PARTOF
+          )}</div>`
+        );
+      }
+
+      if (props.BORDERPRECISION) {
+        const labels = {
+          1: "Approximate",
+          2: "Moderately precise",
+          3: "Precise"
+        };
+
+        const label =
+          labels[Number(props.BORDERPRECISION)] ||
+          props.BORDERPRECISION;
+
+        rows.push(
+          `<div>Border confidence: ${escapeHtml(
+            String(label)
+          )}</div>`
+        );
+      }
+
+      content.innerHTML = rows.join("");
+    }
+
+    panel.classList.add("visible");
   }
 
 
@@ -2711,11 +2887,7 @@
         if (
           state.selectedEntity
         ) {
-          state.selectedEntity =
-            null;
-
-          renderMap();
-          updateEntityList();
+          selectEntityByName(null);
         }
       }
     );
