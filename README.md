@@ -6,7 +6,72 @@
 
 This historical boundaries project aims at providing ready-to-use base maps for mapping historical data. It is __work in progress__: verify the maps by comparison to other sources before using in academic work. If you see errors, report them in the "issues" section.
 
-If you use the maps, think about giving back by [contributing](CONTRIBUTING.md).
+```text
+Structure we're setting up
+
+This is deliberately more than a basic D3 map. The UI is now structured as:
+
+┌──────────────────────────────────────────────────────────────┐
+│  ◉ HISTORICAL ATLAS             1492 AD             ⌕  ?     │
+├───────────────┬──────────────────────────────────────────────┤
+│               │                                              │
+│ FIND PLACE    │                                              │
+│ ┌───────────┐ │                                              │
+│ │ Search... │ │                  HISTORICAL                  │
+│ └───────────┘ │                     MAP                      │
+│               │                                              │
+│ HISTORICAL    │                                              │
+│ 1492 AD       │                         +                    │
+│               │                         −                    │
+│ ENTITIES      │                         ◌                    │
+│               │                                              │
+│ Spain         │                                              │
+│ France        │                                              │
+│ Ottoman       │                                              │
+│ ...           │                                              │
+│               │                                              │
+│ BORDER        │                                              │
+│ ─ Precise     │                                              │
+│ - Approx.     │                                              │
+├───────────────┴──────────────────────────────────────────────┤
+│ CHRONOLOGY     Historical timeline       ‹  PLAY  ›          │
+│                                                              │
+│ ●──────●────────●──────●────────●────────●───────────────●  │
+│ Earliest            1492                       Present        │
+│                                                              │
+│ Prehistory Ancient Classical Medieval Early Modern Modern   │
+├──────────────────────────────────────────────────────────────┤
+│ Historical Atlas / Historical boundaries      42 regions     │
+└──────────────────────────────────────────────────────────────┘
+
+The key thing is that the HTML doesn't need to change much as we expand the application. We can add later:
+
+historical events
+wars
+battles
+rulers
+dynasties
+religions
+languages
+population
+economic data
+military strength
+migrations
+trade routes
+exploration routes
+colonial possessions
+treaties
+revolutions
+infrastructure
+cities
+archaeological sites
+custom user datasets
+
+all as additional timeline layers over the same geographic engine.
+
+
+
+```
 
 ## Apps
 
