@@ -129,14 +129,14 @@ input:focus-visible {
   -webkit-backdrop-filter: blur(16px);
 }
 
-.atlas-brand {
+.brand {
   display: flex;
   align-items: center;
   gap: 13px;
   min-width: 240px;
 }
 
-.atlas-brand-mark {
+.brand-mark {
   width: 30px;
   height: 30px;
 
@@ -152,7 +152,7 @@ input:focus-visible {
   font-size: 14px;
 }
 
-.atlas-brand h1 {
+.brand h1 {
   margin: 0;
 
   font-family: Georgia, "Times New Roman", serif;
@@ -161,9 +161,9 @@ input:focus-visible {
   letter-spacing: 0.02em;
 }
 
-.atlas-brand span {
+.brand-text p {
   display: block;
-  margin-top: -2px;
+  margin: -2px 0 0;
 
   color: var(--text-muted);
   font-size: 10px;
@@ -171,21 +171,70 @@ input:focus-visible {
   text-transform: uppercase;
 }
 
-.atlas-year {
+.header-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+}
 
+.current-year {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 19px;
   letter-spacing: 0.03em;
   color: var(--accent-bright);
+
+  white-space: nowrap;
 }
 
-.atlas-header-actions {
+.header-actions {
   display: flex;
   align-items: center;
   gap: 7px;
+}
+
+/* =========================================================
+    VIEW SWITCH (Atlas / Map / Globe)
+    ========================================================= */
+
+.view-switch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  padding: 2px;
+  margin-right: 6px;
+
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.view-button {
+  padding: 4px 11px;
+
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+
+  font-size: 11px;
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+
+  transition:
+    color 140ms ease,
+    background 140ms ease;
+}
+
+.view-button:hover {
+  color: var(--text);
+}
+
+.view-button.active {
+  color: var(--accent-bright);
+  background: var(--accent-soft);
+  border-color: rgba(201, 169, 110, 0.22);
 }
 
 /* =========================================================
@@ -194,8 +243,10 @@ input:focus-visible {
 
 .icon-button,
 .header-button,
+.map-control,
 .map-button,
-.timeline-button {
+.timeline-button,
+.timeline-play {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -215,8 +266,10 @@ input:focus-visible {
 
 .icon-button:hover,
 .header-button:hover,
+.map-control:hover,
 .map-button:hover,
-.timeline-button:hover {
+.timeline-button:hover,
+.timeline-play:hover {
   color: var(--text);
   background: rgba(255, 255, 255, 0.075);
   border-color: var(--border-strong);
@@ -224,8 +277,10 @@ input:focus-visible {
 
 .icon-button:active,
 .header-button:active,
+.map-control:active,
 .map-button:active,
-.timeline-button:active {
+.timeline-button:active,
+.timeline-play:active {
   transform: translateY(1px);
 }
 
@@ -267,43 +322,84 @@ input:focus-visible {
   overflow: hidden;
 }
 
-.sidebar-top {
+.sidebar-section {
   padding: 17px 16px 13px;
   border-bottom: 1px solid var(--border);
 }
 
-.sidebar-heading {
+.sidebar-section.entities-section {
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 10px 8px;
+}
+
+.section-label {
+  display: block;
+
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.section-heading {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
 
-  margin-bottom: 12px;
+  padding: 0 8px;
+  margin-bottom: 10px;
 }
 
-.sidebar-heading h2 {
-  margin: 0;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.sidebar-heading span {
+.section-count {
   color: var(--text-muted);
   font-size: 11px;
+}
+
+.date-heading {
+  margin-bottom: 8px;
+}
+
+.date-display {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.sidebar-year {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  color: var(--accent-bright);
+}
+
+.date-context {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.empty-state {
+  padding: 18px 12px;
+
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
 }
 
 /* =========================================================
    SEARCH
    ========================================================= */
 
-.search-wrapper {
+.search-box {
   position: relative;
+
+  margin-top: 10px;
 }
 
-.search-wrapper::before {
-  content: "⌕";
-
+.search-icon {
   position: absolute;
   left: 11px;
   top: 50%;
@@ -422,12 +518,14 @@ input:focus-visible {
   background: rgba(255, 255, 255, 0.045);
 }
 
+.entity-item.selected,
 .entity-item.active {
   color: var(--text);
   background: var(--accent-soft);
   border-color: rgba(201, 169, 110, 0.18);
 }
 
+.entity-item.selected::before,
 .entity-item.active::before {
   content: "";
 
@@ -490,21 +588,68 @@ input:focus-visible {
   background: var(--text-soft);
 }
 
+.legend-line.precision-low,
 .legend-line.low {
   opacity: 0.35;
 }
 
+.legend-line.precision-medium,
 .legend-line.medium {
   opacity: 0.6;
 }
 
+.legend-line.precision-high,
 .legend-line.high {
   opacity: 0.95;
 }
 
+.legend {
+  margin-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 6px 0;
+
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
 /* =========================================================
-   MAP
+   MAP VIEWS
    ========================================================= */
+
+.map-view-stack {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+.map-view {
+  position: absolute;
+  inset: 0;
+
+  display: none;
+
+  overflow: hidden;
+
+  background:
+   radial-gradient(
+     ellipse at center,
+     rgba(255, 255, 255, 0.025),
+     transparent 68%
+   ),
+   var(--map-bg);
+}
+
+.map-view.active {
+  display: block;
+}
 
 #map {
   position: relative;
@@ -514,12 +659,12 @@ input:focus-visible {
   overflow: hidden;
 
   background:
-    radial-gradient(
-      ellipse at center,
-      rgba(255, 255, 255, 0.025),
-      transparent 68%
-    ),
-    var(--map-bg);
+   radial-gradient(
+     ellipse at center,
+     rgba(255, 255, 255, 0.025),
+     transparent 68%
+   ),
+   var(--map-bg);
 }
 
 /*
@@ -563,46 +708,87 @@ input:focus-visible {
 }
 
 /* =========================================================
-   D3 MAP FEATURES
+   D3 MAP FEATURES — HISTORICAL REGIONS
    ========================================================= */
 
-.country {
+.historical-region {
   fill: var(--map-land);
+  fill-opacity: 0.92;
+
   stroke: var(--map-stroke);
   stroke-width: 0.65px;
 
   vector-effect: non-scaling-stroke;
 
-  transition:
-    fill 120ms ease,
-    opacity 120ms ease,
-    filter 120ms ease;
-}
-
-.country:hover {
-  fill: var(--map-land-hover);
   cursor: pointer;
-  filter: brightness(1.08);
+
+  transition:
+   fill 140ms ease,
+   fill-opacity 140ms ease,
+   filter 140ms ease;
 }
 
-.country.selected {
+.historical-region:hover,
+.historical-region.hovered {
+  fill: var(--map-land-hover);
+  fill-opacity: 1;
+  filter: brightness(1.1);
+}
+
+.historical-region.selected {
   fill: var(--accent-bright);
+  fill-opacity: 0.95;
+  stroke: var(--accent-bright);
+  stroke-width: 1.4px;
 }
 
-.country.low-confidence {
-  opacity: 0.55;
+.historical-region.search-match {
+  stroke: var(--accent);
+  stroke-width: 1.2px;
 }
 
-.country.medium-confidence {
-  opacity: 0.78;
+/* Border confidence (BORDERPRECISION) */
+
+.historical-region.precision-1 {
+  fill-opacity: 0.62;
+  stroke-dasharray: 3 3;
 }
 
-.country.high-confidence {
-  opacity: 1;
+.historical-region.precision-2 {
+  fill-opacity: 0.82;
 }
 
-.country.boundary-uncertain {
-  stroke-dasharray: 2 2;
+.historical-region.precision-3 {
+  fill-opacity: 0.95;
+}
+
+/* Separate border overlay layer (drawn above fills) */
+
+.historical-border {
+  fill: none;
+  stroke: rgba(24, 27, 24, 0.6);
+  stroke-width: 0.5px;
+
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+/* Historical settlements */
+
+.historical-place {
+  fill: var(--accent-bright);
+  fill-opacity: 0.85;
+  stroke: rgba(11, 13, 12, 0.75);
+  stroke-width: 0.6px;
+
+  vector-effect: non-scaling-stroke;
+  pointer-events: all;
+
+  cursor: pointer;
+}
+
+.historical-place:hover {
+  fill-opacity: 1;
 }
 
 /* =========================================================
@@ -611,7 +797,7 @@ input:focus-visible {
 
 .map-controls {
   position: absolute;
-  z-index: 10;
+  z-index: 500;
 
   top: 16px;
   right: 16px;
@@ -621,7 +807,7 @@ input:focus-visible {
   gap: 5px;
 }
 
-.map-button {
+.map-control {
   width: 34px;
   height: 34px;
 
@@ -630,7 +816,7 @@ input:focus-visible {
   font-size: 17px;
 }
 
-.map-button.reset {
+.map-control:last-child {
   margin-top: 5px;
   font-size: 13px;
 }
@@ -662,8 +848,48 @@ input:focus-visible {
   animation: panel-in 180ms ease;
 }
 
-#mapInfo[hidden] {
+#mapInfo[hidden],
+#mapInfo:not(.visible) {
   display: none;
+}
+
+.map-info-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 6px;
+}
+
+.info-kicker {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--accent);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.panel-close {
+  width: 27px;
+  height: 27px;
+
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+
+  color: var(--text-muted);
+  background: transparent;
+
+  border-radius: 5px;
+
+  cursor: pointer;
+}
+
+.panel-close:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 #mapInfoTitle {
@@ -714,7 +940,7 @@ input:focus-visible {
   position: absolute;
   inset: 0;
 
-  z-index: 30;
+  z-index: 800;
 
   display: flex;
   align-items: center;
@@ -813,7 +1039,20 @@ input:focus-visible {
   font-weight: 500;
 }
 
-#timelineYearLabel {
+.timeline-kicker {
+  color: var(--text-muted);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.timeline-title strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#timelineYearLabel,
+.timeline-current-year {
   color: var(--accent);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 13px;
@@ -835,19 +1074,26 @@ input:focus-visible {
   font-size: 12px;
 }
 
-#playButton {
+#playButton,
+.timeline-play {
   min-width: 68px;
+  height: 29px;
+
   color: var(--accent-bright);
   border-color: rgba(201, 169, 110, 0.22);
   background: rgba(201, 169, 110, 0.07);
+  border-radius: 6px;
+
+  font-size: 12px;
 }
 
 /* =========================================================
    RANGE SLIDER
    ========================================================= */
 
-.timeline-track {
+.timeline-rail {
   position: relative;
+
   padding: 5px 0;
 }
 
@@ -975,7 +1221,27 @@ input:focus-visible {
   margin-top: 12px;
 }
 
-.timeline-period {
+#timelineLabels span {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+#timelineCurrent {
+  color: var(--accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+}
+
+.timeline-periods {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 10px;
+}
+
+.timeline-period,
+.period-button {
   padding: 4px 7px;
 
   color: var(--text-muted);
@@ -994,13 +1260,15 @@ input:focus-visible {
     border-color 140ms ease;
 }
 
-.timeline-period:hover {
+.timeline-period:hover,
+.period-button:hover {
   color: var(--text);
   background: rgba(255, 255, 255, 0.04);
   border-color: var(--border);
 }
 
-.timeline-period.active {
+.timeline-period.active,
+.period-button.active {
   color: var(--accent-bright);
   background: var(--accent-soft);
   border-color: rgba(201, 169, 110, 0.18);
@@ -1011,12 +1279,16 @@ input:focus-visible {
    ========================================================= */
 
 .atlas-footer {
-  position: absolute;
+  position: fixed;
 
-  bottom: 7px;
+  bottom: calc(var(--timeline-height) + 7px);
   right: 12px;
 
-  z-index: 12;
+  z-index: 45;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
 
   color: rgba(255, 255, 255, 0.32);
 
@@ -1024,6 +1296,10 @@ input:focus-visible {
   letter-spacing: 0.04em;
 
   pointer-events: none;
+}
+
+.footer-divider {
+  opacity: 0.55;
 }
 
 /* =========================================================
@@ -1124,6 +1400,167 @@ input:focus-visible {
 }
 
 /* =========================================================
+   TOOLTIP (shared by all views)
+   ========================================================= */
+
+.atlas-tooltip {
+  position: fixed;
+  z-index: 1000;
+
+  max-width: 240px;
+  padding: 8px 11px;
+
+  color: var(--text);
+  background: rgba(14, 17, 15, 0.95);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+
+  box-shadow: var(--shadow-md);
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  pointer-events: none;
+
+  transition: opacity 120ms ease;
+}
+
+.atlas-tooltip strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+}
+
+.atlas-tooltip span {
+  color: var(--text-soft);
+}
+
+/* =========================================================
+   LEAFLET VIEW
+   ========================================================= */
+
+.leaflet-view {
+  background: #0d141b;
+}
+
+.leaflet-view.leaflet-container {
+  background: #0d141b;
+
+  font: inherit;
+}
+
+.leaflet-view .leaflet-control-zoom {
+  border: 1px solid var(--border) !important;
+  border-radius: 7px !important;
+
+  overflow: hidden;
+
+  box-shadow: var(--shadow-md);
+}
+
+.leaflet-view .leaflet-control-zoom a {
+  width: 34px !important;
+  height: 34px !important;
+
+  color: var(--text-soft) !important;
+  background: rgba(17, 20, 18, 0.94) !important;
+  border-bottom: 1px solid var(--border) !important;
+
+  line-height: 34px !important;
+}
+
+.leaflet-view .leaflet-control-zoom a:hover {
+  color: var(--text) !important;
+  background: rgba(30, 34, 31, 0.98) !important;
+}
+
+.leaflet-entity-tooltip {
+  color: var(--text) !important;
+  background: rgba(14, 17, 15, 0.95) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 7px !important;
+  box-shadow: var(--shadow-md) !important;
+
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 12px !important;
+}
+
+.leaflet-entity-tooltip::before {
+  display: none !important;
+}
+
+/* =========================================================
+   GLOBE VIEW (3D ORTHOGRAPHIC)
+   ========================================================= */
+
+.globe-view {
+  background:
+   radial-gradient(
+     circle at 50% 45%,
+     rgba(201, 169, 110, 0.05),
+     transparent 55%
+   ),
+   #05070a;
+}
+
+.globe-svg {
+  display: block;
+
+  cursor: grab;
+}
+
+.globe-svg:active {
+  cursor: grabbing;
+}
+
+.globe-sphere {
+  fill: #0e1720;
+  stroke: rgba(201, 169, 110, 0.3);
+  stroke-width: 1px;
+}
+
+.globe-graticule {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.07);
+  stroke-width: 0.5px;
+
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.globe-region-layer .historical-region {
+  stroke: rgba(5, 7, 10, 0.6);
+}
+
+.globe-place-layer .historical-place {
+  pointer-events: none;
+}
+
+.globe-hint {
+  position: absolute;
+  z-index: 600;
+
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  padding: 4px 11px;
+
+  color: var(--text-muted);
+  background: rgba(14, 17, 15, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+
+  font-size: 10px;
+  letter-spacing: 0.05em;
+
+  pointer-events: none;
+}
+
+.globe-hint[hidden] {
+  display: none;
+}
+
+/* =========================================================
    SCROLLBARS
    ========================================================= */
 
@@ -1174,11 +1611,11 @@ input:focus-visible {
     --timeline-height: 150px;
   }
 
-  .atlas-brand {
+  .brand {
     min-width: auto;
   }
 
-  .atlas-brand span {
+  .brand-text p {
     display: none;
   }
 
@@ -1214,22 +1651,24 @@ input:focus-visible {
     padding: 0 12px;
   }
 
-  .atlas-brand h1 {
+  .brand h1 {
     font-size: 15px;
   }
 
-  .atlas-brand-mark {
+  .brand-mark {
     width: 27px;
     height: 27px;
   }
 
-  .atlas-year {
+  .header-center {
     position: static;
     transform: none;
 
     margin-left: auto;
     margin-right: 9px;
+  }
 
+  .current-year {
     font-size: 15px;
   }
 
@@ -1261,14 +1700,18 @@ input:focus-visible {
     border-top: 1px solid var(--border);
   }
 
-  #map {
+  .map-view-stack {
     order: 1;
+
+    position: relative;
 
     height: 58vh;
     min-height: 390px;
+
+    flex: none;
   }
 
-  .sidebar-top {
+  .sidebar-section {
     padding: 10px 12px;
   }
 
@@ -1305,7 +1748,16 @@ input:focus-visible {
     padding-bottom: 2px;
   }
 
-  .timeline-period {
+  .timeline-periods {
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 3px;
+
+    padding-bottom: 2px;
+  }
+
+  .timeline-period,
+  .period-button {
     flex-shrink: 0;
   }
 
@@ -1319,15 +1771,15 @@ input:focus-visible {
    ========================================================= */
 
 @media (max-width: 430px) {
-  #map {
+  .map-view-stack {
     min-height: 340px;
   }
 
-  .atlas-brand h1 {
+  .brand h1 {
     font-size: 14px;
   }
 
-  .atlas-year {
+  .current-year {
     font-size: 13px;
   }
 

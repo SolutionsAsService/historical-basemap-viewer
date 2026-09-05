@@ -25,6 +25,21 @@
   ></script>
 
   <!-- =====================================================
+       LEAFLET (vendored, no CDN dependency)
+       Used for the slippy "Map" view.
+       ===================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="./lib/leaflet/leaflet.css"
+  >
+
+  <script
+    src="./lib/leaflet/leaflet.js"
+    defer
+  ></script>
+
+  <!-- =====================================================
        APPLICATION STYLES
        ===================================================== -->
 
@@ -85,6 +100,42 @@
 
 
       <div class="header-actions">
+
+        <div
+          id="viewSwitch"
+          class="view-switch"
+          role="group"
+          aria-label="Map view"
+        >
+
+          <button
+            class="view-button active"
+            type="button"
+            data-view="atlas"
+            title="Atlas view (flat historical map)"
+          >
+            Atlas
+          </button>
+
+          <button
+            class="view-button"
+            type="button"
+            data-view="map"
+            title="Slippy map view (Leaflet)"
+          >
+            Map
+          </button>
+
+          <button
+            class="view-button"
+            type="button"
+            data-view="globe"
+            title="3D globe view"
+          >
+            Globe
+          </button>
+
+        </div>
 
         <button
           id="searchToggle"
@@ -283,31 +334,101 @@
 
 
       <!-- ===============================================
-           MAP
+           MAP VIEWS
+           Three stacked views; exactly one is visible at
+           a time, controlled by the header view switch.
+
+           #map        -> D3 flat atlas (default)
+           #leafletMap -> Leaflet slippy map
+           #globe      -> D3 orthographic 3D globe
            =============================================== -->
 
-      <section
-        id="map"
-        class="atlas-map"
-        aria-label="Historical world map"
-      >
+      <div class="map-view-stack">
 
-        <!-- D3 inserts SVG here -->
+        <section
+          id="map"
+          class="atlas-map map-view active"
+          aria-label="Historical world map"
+        >
+
+          <!-- D3 inserts SVG here -->
+
+        </section>
+
+        <section
+          id="leafletMap"
+          class="map-view leaflet-view"
+          aria-label="Historical slippy map"
+        >
+
+          <!-- Leaflet attaches here -->
+
+        </section>
+
+        <section
+          id="globe"
+          class="map-view globe-view"
+          aria-label="Historical 3D globe"
+        >
+
+          <!-- D3 orthographic globe renders here -->
+
+        </section>
 
         <div
           id="loading"
           class="loading-overlay"
         >
-          Loading historical atlas…
+
+          <div class="loading-inner">
+
+            <div class="loading-spinner"></div>
+
+            <div class="loading-title">
+              Historical Atlas
+            </div>
+
+            <div
+              id="loadingText"
+              class="loading-text"
+            >
+              Loading historical atlas…
+            </div>
+
+          </div>
+
         </div>
 
         <div
           id="error"
           class="error-overlay"
           hidden
-        ></div>
+        >
 
-      </section>
+          <div class="error-inner">
+
+            <div class="error-title">
+              Something went wrong
+            </div>
+
+            <div
+              id="errorText"
+              class="error-text"
+            ></div>
+
+          </div>
+
+        </div>
+
+        <div
+          id="globeHint"
+          class="globe-hint"
+          hidden
+        >
+          Drag to rotate · scroll to zoom
+        </div>
+
+      </div>
 
 
       <!-- ===============================================
@@ -490,7 +611,7 @@
             id="timelineTicks"
             class="timeline-ticks"
           >
-            <!-- JS can populate important dates later -->
+            <!-- JS populates one tick per available year -->
           </div>
 
           <input
@@ -516,11 +637,15 @@
           class="timeline-labels"
         >
 
-          <span>
+          <span id="timelineEarliest">
             Earliest
           </span>
 
-          <span>
+          <span id="timelineCurrent">
+            —
+          </span>
+
+          <span id="timelineLatest">
             Present
           </span>
 
