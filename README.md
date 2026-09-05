@@ -2,6 +2,31 @@
 
 ![world 1880 DRAFT ROUGH](img/historicalmaps-leaflet.png)
 
+## Interactive Historical Atlas (this repo's viewer)
+
+`index.html` + `app.js` + `styles.css` form a self-contained interactive
+**timeline + map** application over the GeoJSON dataset:
+
+- **Timeline** — a slider with one tick per available snapshot, era shortcut
+  buttons (Prehistory → Contemporary), play/pause animation, and ‹ › stepping
+  (arrow keys work too). The current year is shown in the header, sidebar and
+  timeline, and deep-linkable via `?year=1492`.
+- **Three map views**, switchable from the header and via `?view=`:
+  - **Atlas** — flat D3 map (Natural Earth projection) with pan/zoom,
+    tooltips, entity selection and an info panel.
+  - **Map** — a Leaflet slippy map. A graticule replaces modern web tiles so
+    historical borders are never overlaid on present-day geography (this also
+    keeps the app fully offline-capable).
+  - **Globe** — a 3D orthographic globe viewer (D3): drag to rotate, scroll to
+    zoom, with slow auto-rotation when idle.
+- **Historical regions** are colored by their controlling authority
+  (`SUBJECTO`) and styled by `BORDERPRECISION` (approximate borders are
+  dashed/translucent — see the Border confidence legend). Settlements from
+  `places.geojson` render in every view, filtered by the selected year.
+
+Serve the folder with any static file server (e.g. `python3 -m http.server`)
+and open `index.html`.
+
 > "For most of the past 5,000 years, kingdoms and empires were exceptional islands of political hierarchy, surrounded by much larger territories whose inhabitants systematically avoided fixed, overarching systems of authority." - Graeber and Wengrow, 2021, _The Dawn of Everything_
 
 This historical boundaries project aims at providing ready-to-use base maps for mapping historical data. It is __work in progress__: verify the maps by comparison to other sources before using in academic work. If you see errors, report them in the "issues" section.
@@ -12,7 +37,7 @@ Structure we're setting up
 This is deliberately more than a basic D3 map. The UI is now structured as:
 
 ┌──────────────────────────────────────────────────────────────┐
-│  ◉ HISTORICAL ATLAS             1492 AD             ⌕  ?     │
+│  ◉ HISTORICAL ATLAS      1492 AD   [Atlas|Map|Globe]  ⌕  ?   │
 ├───────────────┬──────────────────────────────────────────────┤
 │               │                                              │
 │ FIND PLACE    │                                              │

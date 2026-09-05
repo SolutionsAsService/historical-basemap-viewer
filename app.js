@@ -38,6 +38,8 @@
     placesUrl: "./geojson/places.geojson",
 
     mapSelector: "#map",
+    leafletSelector: "#leafletMap",
+    globeSelector: "#globe",
     timelineSelector: "#timeline",
     yearSelector: "#year",
     yearLabelSelector: "#yearLabel",
@@ -48,13 +50,34 @@
     entityListSelector: "#entityList",
     loadingSelector: "#loading",
     errorSelector: "#error",
+    loadingTextSelector: "#loadingText",
+    errorTextSelector: "#errorText",
+    viewSwitchSelector: "#viewSwitch",
+    globeHintSelector: "#globeHint",
+    timelineTicksSelector: "#timelineTicks",
+    timelineEarliestSelector: "#timelineEarliest",
+    timelineLatestSelector: "#timelineLatest",
+    timelineCurrentSelector: "#timelineCurrent",
 
     animationDuration: 450,
     playInterval: 900,
 
+    // Available map views (header switch)
+    views: ["atlas", "map", "globe"],
+    defaultView: "atlas",
+
     // World map defaults
     width: 1200,
     height: 650,
+
+    // Globe behaviour
+    globe: {
+      minScaleFactor: 0.7,
+      maxScaleFactor: 4.5,
+      dragSensitivity: 0.28,
+      // Slow auto-rotation while idle on the globe view
+      autoRotateDegreesPerSecond: 2.5
+    },
 
     // Default map padding
     padding: 20
@@ -78,6 +101,9 @@
     places: null,
     placesLoaded: false,
 
+    // Active view: "atlas" (D3 flat), "map" (Leaflet), "globe" (D3 3D)
+    view: CONFIG.defaultView,
+
     projection: null,
     path: null,
 
@@ -85,6 +111,30 @@
     mapLayer: null,
     borderLayer: null,
     placeLayer: null,
+    zoom: null,
+
+    // Leaflet slippy-map view
+    leaflet: {
+      map: null,
+      regionLayer: null,
+      placeLayer: null
+    },
+
+    // D3 orthographic globe view
+    globe: {
+      svg: null,
+      sphereLayer: null,
+      graticuleLayer: null,
+      regionLayer: null,
+      placeLayer: null,
+      projection: null,
+      path: null,
+      rotation: [-20, -30, 0],
+      baseScale: null,
+      scale: 1,
+      dragging: false,
+      autoRotateTimer: null
+    },
 
     playing: false,
     playTimer: null,
@@ -103,6 +153,8 @@
   const $ = (selector) => document.querySelector(selector);
 
   const mapElement = $(CONFIG.mapSelector);
+  const leafletElement = $(CONFIG.leafletSelector);
+  const globeElement = $(CONFIG.globeSelector);
   const timelineElement = $(CONFIG.timelineSelector);
   const yearElement = $(CONFIG.yearSelector);
   const yearLabelElement = $(CONFIG.yearLabelSelector);
@@ -113,6 +165,11 @@
   const entityListElement = $(CONFIG.entityListSelector);
   const loadingElement = $(CONFIG.loadingSelector);
   const errorElement = $(CONFIG.errorSelector);
+  const loadingTextElement = $(CONFIG.loadingTextSelector);
+  const errorTextElement = $(CONFIG.errorTextSelector);
+  const viewSwitchElement = $(CONFIG.viewSwitchSelector);
+  const globeHintElement = $(CONFIG.globeHintSelector);
+  const timelineTicksElement = $(CONFIG.timelineTicksSelector);
 
 
   /* ----------------------------------------------------------
@@ -122,7 +179,12 @@
   function setLoading(visible, message = "Loading…") {
     if (!loadingElement) return;
 
-    loadingElement.textContent = message;
+    if (loadingTextElement) {
+      loadingTextElement.textContent = message;
+    } else {
+      loadingElement.textContent = message;
+    }
+
     loadingElement.hidden = !visible;
   }
 
@@ -132,7 +194,12 @@
 
     if (!errorElement) return;
 
-    errorElement.textContent = message;
+    if (errorTextElement) {
+      errorTextElement.textContent = message;
+    } else {
+      errorElement.textContent = message;
+    }
+
     errorElement.hidden = false;
   }
 
@@ -140,7 +207,12 @@
   function clearError() {
     if (!errorElement) return;
 
-    errorElement.textContent = "";
+    if (errorTextElement) {
+      errorTextElement.textContent = "";
+    } else {
+      errorElement.textContent = "";
+    }
+
     errorElement.hidden = true;
   }
 
@@ -373,6 +445,93 @@
 
 
   /* ----------------------------------------------------------
+     FEATURE COLORS
+
+     Historical regions are colored deterministically by
+     their controlling authority (SUBJECTO), falling back
+     to their name, so related territories share a hue in
+     every view (atlas, Leaflet map, globe).
+     ---------------------------------------------------------- */
+
+  function getFeatureAuthority(feature) {
+    const props =
+      (feature && feature.properties) || {};
+
+    return (
+      props.SUBJECTO ||
+      props.PARTOF ||
+      props.NAME ||
+      props.name ||
+      ""
+    );
+  }
+
+
+  function getFeatureColor(feature) {
+    const key = String(
+      getFeatureAuthority(feature)
+    );
+
+    let hash = 0;
+
+    for (
+      let i = 0;
+      i < key.length;
+      i += 1
+    ) {
+      hash =
+        ((hash << 5) - hash) +
+        key.charCodeAt(i);
+
+      hash |= 0;
+    }
+
+    const hue =
+      ((hash % 360) + 360) % 360;
+
+    return `hsl(${hue}, 30%, 55%)`;
+  }
+
+
+  /* ----------------------------------------------------------
+     FEATURE VISIBLE ON GLOBE HEMISPHERE
+     ---------------------------------------------------------- */
+
+  function isFeatureVisibleOnGlobe(feature) {
+    if (
+      !state.globe.projection ||
+      !feature
+    ) {
+      return true;
+    }
+
+    try {
+      const centroid =
+        d3.geoCentroid(feature);
+
+      if (
+        !centroid ||
+        !Number.isFinite(centroid[0]) ||
+        !Number.isFinite(centroid[1])
+      ) {
+        return false;
+      }
+
+      const rotation =
+        state.globe.projection.rotate();
+
+      return d3.geoDistance(
+        centroid,
+        [-rotation[0], -rotation[1]]
+      ) <= Math.PI / 2;
+
+    } catch (error) {
+      return false;
+    }
+  }
+
+
+  /* ----------------------------------------------------------
      MAP INITIALIZATION
      ---------------------------------------------------------- */
 
@@ -383,24 +542,21 @@
       );
     }
 
-    const rect = mapElement.getBoundingClientRect();
-
-    const width =
-      rect.width ||
-      CONFIG.width;
-
-    const height =
-      rect.height ||
-      CONFIG.height;
-
     state.svg = d3
       .select(mapElement)
       .append("svg")
       .attr("class", "atlas-svg")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", `0 0 ${width} ${height}`)
-      .attr("preserveAspectRatio", "xMidYMid meet");
+      .attr(
+        "viewBox",
+        `0 0 ${CONFIG.width} ${CONFIG.height}`
+      )
+      .attr(
+        "preserveAspectRatio",
+        "xMidYMid meet"
+      );
+
+    const width = CONFIG.width;
+    const height = CONFIG.height;
 
     state.mapLayer = state.svg
       .append("g")
@@ -413,6 +569,110 @@
     state.placeLayer = state.svg
       .append("g")
       .attr("class", "atlas-place-layer");
+
+    /*
+      Zoom + pan on the flat atlas.
+      The zoom buttons in the HTML dispatch
+      "atlas:zoom" CustomEvents; we also wire
+      wheel/drag zoom directly through D3.
+    */
+
+    const zoom = d3
+      .zoom()
+      .scaleExtent([1, 12])
+      .filter(() => {
+        /*
+          Only start wheel/drag zoom gestures from
+          empty map space so region hover and click
+          interactions keep working.
+        */
+
+        const event = d3.event;
+
+        if (!event) {
+          return true;
+        }
+
+        if (event.type === "wheel") {
+          return true;
+        }
+
+        if (
+          event.target &&
+          event.target.closest &&
+          event.target.closest(
+            ".historical-region, .historical-place"
+          )
+        ) {
+          return false;
+        }
+
+        return !event.button;
+      })
+      .on("zoom", () => {
+        const transform = d3.event
+          ? d3.event.transform
+          : null;
+
+        if (!transform) {
+          return;
+        }
+
+        [
+          state.mapLayer,
+          state.borderLayer,
+          state.placeLayer
+        ].forEach(layer => {
+          if (layer) {
+            layer.attr(
+              "transform",
+              transform
+            );
+          }
+        });
+      });
+
+    state.zoom = zoom;
+    state.svg.call(zoom);
+
+    window.addEventListener(
+      "atlas:zoom",
+      event => {
+
+        const detail =
+          (event && event.detail) || {};
+
+        if (
+          detail.direction === "in"
+        ) {
+          state.svg
+            .transition()
+            .duration(250)
+            .call(zoom.scaleBy, 1.5);
+        }
+
+        if (
+          detail.direction === "out"
+        ) {
+          state.svg
+            .transition()
+            .duration(250)
+            .call(zoom.scaleBy, 1 / 1.5);
+        }
+
+        if (
+          detail.direction === "reset"
+        ) {
+          state.svg
+            .transition()
+            .duration(350)
+            .call(
+              zoom.transform,
+              d3.zoomIdentity
+            );
+        }
+      }
+    );
 
     /*
       Natural Earth is a good default for a world historical atlas.
@@ -478,10 +738,6 @@
         Math.min(width, height) * 0.31
       );
 
-    state.path = d3
-      .geoPath()
-      .projection(state.projection);
-
     renderMap();
   }
 
@@ -494,6 +750,14 @@
     if (!state.currentMap) {
       return;
     }
+
+    /*
+      Keep the alternate views in sync with the
+      currently loaded historical map.
+    */
+
+    renderLeafletView();
+    renderGlobeView();
 
     const features =
       state.currentMap.features || [];
@@ -714,37 +978,11 @@
       return;
     }
 
-    const features =
-      state.places.features || [];
-
-    const currentYear =
-      state.currentYear;
+    renderLeafletPlaces();
+    renderGlobePlaces();
 
     const visiblePlaces =
-      features.filter(feature => {
-
-        const props =
-          feature.properties || {};
-
-        const since =
-          Number.isFinite(
-            Number(props.inhabitedSince)
-          )
-            ? Number(props.inhabitedSince)
-            : -Infinity;
-
-        const until =
-          Number.isFinite(
-            Number(props.inhabitedUntil)
-          )
-            ? Number(props.inhabitedUntil)
-            : Infinity;
-
-        return (
-          currentYear >= since &&
-          currentYear <= until
-        );
-      });
+      getVisiblePlaces();
 
     const places =
       state.placeLayer
@@ -871,16 +1109,13 @@
      FEATURE INTERACTION
      ---------------------------------------------------------- */
 
-  function handleFeatureEnter(event, feature) {
-    const name =
-      getFeatureName(feature);
-
+  function handleFeatureEnter(feature) {
     showTooltip(
-      event,
+      d3.event,
       createFeatureTooltip(feature)
     );
 
-    d3.select(event.currentTarget)
+    d3.select(this)
       .classed(
         "hovered",
         true
@@ -888,15 +1123,15 @@
   }
 
 
-  function handleFeatureMove(event) {
-    moveTooltip(event);
+  function handleFeatureMove() {
+    moveTooltip(d3.event);
   }
 
 
-  function handleFeatureLeave(event) {
+  function handleFeatureLeave() {
     hideTooltip();
 
-    d3.select(event.currentTarget)
+    d3.select(this)
       .classed(
         "hovered",
         false
@@ -904,20 +1139,14 @@
   }
 
 
-  function handleFeatureClick(event, feature) {
-    event.stopPropagation();
+  function handleFeatureClick(feature) {
+    if (d3.event) {
+      d3.event.stopPropagation();
+    }
 
-    const name =
-      getFeatureName(feature);
-
-    state.selectedEntity =
-      state.selectedEntity === name
-        ? null
-        : name;
-
-    renderMap();
-
-    updateEntityList();
+    selectEntityByName(
+      getFeatureName(feature)
+    );
   }
 
 
@@ -925,12 +1154,12 @@
      PLACE INTERACTION
      ---------------------------------------------------------- */
 
-  function handlePlaceEnter(event, feature) {
+  function handlePlaceEnter(feature) {
     const props =
       feature.properties || {};
 
     showTooltip(
-      event,
+      d3.event,
       `
         <strong>${escapeHtml(
           props.name || "Unknown place"
@@ -940,7 +1169,7 @@
       `
     );
 
-    moveTooltip(event);
+    moveTooltip(d3.event);
   }
 
 
@@ -1226,6 +1455,66 @@
         );
       }
     );
+
+    buildTimelineTicks();
+  }
+
+
+  /* ----------------------------------------------------------
+     TIMELINE TICKS
+
+     One tick per available historical snapshot. Deep-time
+     snapshots (far past) get a "major" tick so the rail
+     communicates the huge time spans at a glance.
+     ---------------------------------------------------------- */
+
+  function buildTimelineTicks() {
+    if (!timelineTicksElement) {
+      return;
+    }
+
+    timelineTicksElement.innerHTML = "";
+
+    const count = state.years.length;
+
+    if (!count) {
+      return;
+    }
+
+    const fragment =
+      document.createDocumentFragment();
+
+    state.years.forEach((record, index) => {
+      const tick = document.createElement("div");
+
+      tick.className = "timeline-tick";
+
+      if (record.year < 0) {
+        tick.classList.add("major");
+      }
+
+      tick.style.left =
+        `${(index / Math.max(count - 1, 1)) * 100}%`;
+
+      tick.title = formatYear(record.year);
+
+      fragment.appendChild(tick);
+    });
+
+    timelineTicksElement.appendChild(fragment);
+
+    const earliest = $(CONFIG.timelineEarliestSelector);
+    const latest = $(CONFIG.timelineLatestSelector);
+
+    if (earliest) {
+      earliest.textContent = formatYear(state.years[0].year);
+    }
+
+    if (latest) {
+      latest.textContent = formatYear(
+        state.years[count - 1].year
+      );
+    }
   }
 
 
@@ -1268,7 +1557,65 @@
         );
     }
 
+    const timelineCurrent = $(
+      CONFIG.timelineCurrentSelector
+    );
+
+    if (timelineCurrent) {
+      timelineCurrent.textContent =
+        formatYear(
+          state.currentYear
+        );
+    }
+
+    /*
+      Highlight the era button whose period is closest
+      to (but not after) the selected year.
+    */
+
+    document
+      .querySelectorAll(".period-button")
+      .forEach(button => {
+
+        const buttonYear = Number(
+          button.dataset.year
+        );
+
+        const active =
+          Number.isFinite(buttonYear) &&
+          buttonYear <= state.currentYear &&
+          state.currentYear <
+            nextPeriodYear(buttonYear);
+
+        button.classList.toggle(
+          "active",
+          active
+        );
+      });
+
     updateNavigationButtons();
+  }
+
+
+  function nextPeriodYear(year) {
+    const periodYears = [
+      ...document.querySelectorAll(
+        ".period-button"
+      )
+    ]
+      .map(button =>
+        Number(button.dataset.year)
+      )
+      .filter(Number.isFinite)
+      .sort((a, b) => a - b);
+
+    const next = periodYears.find(
+      periodYear => periodYear > year
+    );
+
+    return next === undefined
+      ? Infinity
+      : next;
   }
 
 
@@ -1306,6 +1653,8 @@
     await loadHistoricalMap(
       record
     );
+
+    updateURLState();
   }
 
 
@@ -1615,6 +1964,19 @@
     const entity =
       params.get("entity");
 
+    const view =
+      params.get("view");
+
+    const result = {
+      year: null,
+      entity,
+      view:
+        view &&
+        CONFIG.views.includes(view)
+          ? view
+          : null
+    };
+
     if (year !== null) {
       const numericYear =
         Number(year);
@@ -1624,17 +1986,11 @@
           numericYear
         )
       ) {
-        return {
-          year: numericYear,
-          entity
-        };
+        result.year = numericYear;
       }
     }
 
-    return {
-      year: null,
-      entity
-    };
+    return result;
   }
 
 
@@ -1662,6 +2018,15 @@
       params.delete(
         "entity"
       );
+    }
+
+    if (
+      state.view &&
+      state.view !== CONFIG.defaultView
+    ) {
+      params.set("view", state.view);
+    } else {
+      params.delete("view");
     }
 
     const url =
@@ -1704,8 +2069,805 @@
           renderMap();
           updateEntityList();
         }
+
+        if (urlState.view) {
+          setView(urlState.view);
+        }
       }
     );
+  }
+
+
+  /* ----------------------------------------------------------
+     LEAFLET SLIPPY-MAP VIEW
+
+     Renders the same historical GeoJSON on a pannable /
+     zoomable Leaflet map. A graticule replaces modern web
+     tiles so the historical borders are never misleadingly
+     overlaid on present-day geography (and the app keeps
+     working fully offline).
+     ---------------------------------------------------------- */
+
+  function initializeLeaflet() {
+    if (
+      state.leaflet.map ||
+      !leafletElement ||
+      typeof L === "undefined"
+    ) {
+      return;
+    }
+
+    state.leaflet.map = L.map(leafletElement, {
+      center: [22, 12],
+      zoom: 2,
+      minZoom: 1,
+      maxZoom: 8,
+      worldCopyJump: true,
+      zoomControl: false,
+      attributionControl: false
+    });
+
+    L.control
+      .zoom({ position: "bottomright" })
+      .addTo(state.leaflet.map);
+
+    L.geoJSON(d3.geoGraticule10(), {
+      style: {
+        className: "leaflet-graticule",
+        color: "rgba(255, 255, 255, 0.09)",
+        weight: 0.7,
+        fill: false,
+        interactive: false
+      }
+    }).addTo(state.leaflet.map);
+
+    state.leaflet.regionLayer =
+      L.geoJSON(null, {
+        style: leafletFeatureStyle,
+
+        onEachFeature(feature, layer) {
+          layer.bindTooltip(
+            getFeatureName(feature),
+            {
+              sticky: true,
+              className: "leaflet-entity-tooltip"
+            }
+          );
+
+          layer.on("click", event => {
+            if (event.originalEvent) {
+              L.DomEvent.stopPropagation(
+                event.originalEvent
+              );
+            }
+
+            selectEntityByName(
+              getFeatureName(feature)
+            );
+          });
+        }
+      }).addTo(state.leaflet.map);
+
+    state.leaflet.placeLayer =
+      L.layerGroup().addTo(
+        state.leaflet.map
+      );
+
+    state.leaflet.map.on("click", () => {
+      if (state.selectedEntity) {
+        selectEntityByName(null);
+      }
+    });
+  }
+
+
+  function leafletFeatureStyle(feature) {
+    const props =
+      (feature && feature.properties) || {};
+
+    const precision =
+      Number(props.BORDERPRECISION) || 1;
+
+    const name = getFeatureName(feature);
+
+    const selected =
+      state.selectedEntity &&
+      name === state.selectedEntity;
+
+    const searchMatch =
+      state.searchTerm &&
+      name
+        .toLowerCase()
+        .includes(
+          state.searchTerm.toLowerCase()
+        );
+
+    return {
+      color: selected
+        ? "#e0c48b"
+        : precision === 1
+          ? "rgba(24, 27, 24, 0.5)"
+          : "rgba(24, 27, 24, 0.85)",
+      weight:
+        selected || searchMatch ? 1.8 : 0.8,
+      dashArray:
+        precision === 1 ? "3 3" : null,
+      fillColor: selected
+        ? "#e0c48b"
+        : getFeatureColor(feature),
+      fillOpacity: selected
+        ? 0.85
+        : precision === 1
+          ? 0.5
+          : precision === 2
+            ? 0.72
+            : 0.88
+    };
+  }
+
+
+  function renderLeafletView() {
+    if (!state.leaflet.regionLayer) {
+      return;
+    }
+
+    state.leaflet.regionLayer.clearLayers();
+
+    if (
+      state.currentMap &&
+      Array.isArray(state.currentMap.features)
+    ) {
+      state.leaflet.regionLayer.addData(
+        state.currentMap.features
+      );
+    }
+
+    renderLeafletPlaces();
+  }
+
+
+  function renderLeafletPlaces() {
+    if (
+      !state.leaflet.placeLayer ||
+      !state.places
+    ) {
+      return;
+    }
+
+    state.leaflet.placeLayer.clearLayers();
+
+    const visiblePlaces =
+      getVisiblePlaces();
+
+    visiblePlaces.forEach(feature => {
+      const coordinates =
+        getCoordinates(feature);
+
+      if (!coordinates) {
+        return;
+      }
+
+      const props =
+        feature.properties || {};
+
+      state.leaflet.placeLayer.addLayer(
+        L.circleMarker(
+          [coordinates[1], coordinates[0]],
+          {
+            className: "leaflet-place",
+            radius: 3.5,
+            color: "#e0c48b",
+            weight: 1,
+            fillColor: "#e0c48b",
+            fillOpacity: 0.9
+          }
+        ).bindTooltip(
+          props.name || "Historical settlement",
+          {
+            className: "leaflet-entity-tooltip"
+          }
+        )
+      );
+    });
+  }
+
+
+  function getVisiblePlaces() {
+    if (!state.places) {
+      return [];
+    }
+
+    const features =
+      state.places.features || [];
+
+    const currentYear =
+      state.currentYear;
+
+    return features.filter(feature => {
+      const props =
+        feature.properties || {};
+
+      /*
+        The dataset currently stores inhabitedSince /
+        inhabitedUntil as null for most settlements.
+        Number(null) is 0, which would wrongly hide
+        them from nearly every year — treat missing
+        values as unbounded instead.
+      */
+
+      const rawSince =
+        props.inhabitedSince;
+
+      const rawUntil =
+        props.inhabitedUntil;
+
+      const since =
+        rawSince === null ||
+        rawSince === undefined ||
+        rawSince === ""
+          ? -Infinity
+          : Number.isFinite(Number(rawSince))
+            ? Number(rawSince)
+            : -Infinity;
+
+      const until =
+        rawUntil === null ||
+        rawUntil === undefined ||
+        rawUntil === ""
+          ? Infinity
+          : Number.isFinite(Number(rawUntil))
+            ? Number(rawUntil)
+            : Infinity;
+
+      return (
+        currentYear >= since &&
+        currentYear <= until
+      );
+    });
+  }
+
+
+  /* ----------------------------------------------------------
+     GLOBE VIEW (3D ORTHOGRAPHIC)
+
+     A drag-rotatable orthographic projection of the same
+     historical regions — a 3D "globe viewer" built with D3,
+     so no extra dependency is required.
+     ---------------------------------------------------------- */
+
+  function initializeGlobe() {
+    if (
+      state.globe.svg ||
+      !globeElement
+    ) {
+      return;
+    }
+
+    const rect =
+      globeElement.getBoundingClientRect();
+
+    const width =
+      rect.width || CONFIG.width;
+
+    const height =
+      rect.height || CONFIG.height;
+
+    const projection =
+      d3.geoOrthographic()
+        .translate([
+          width / 2,
+          height / 2
+        ])
+        .rotate(state.globe.rotation)
+        .clipAngle(90);
+
+    state.globe.baseScale =
+      Math.min(width, height) / 2 - 24;
+
+    projection.scale(
+      state.globe.baseScale *
+        state.globe.scale
+    );
+
+    state.globe.projection = projection;
+
+    /*
+      pointRadius must be an accessor (not a constant)
+      so d3 v5 forwards the feature datum to it.
+    */
+
+    state.globe.path = d3
+      .geoPath()
+      .projection(projection)
+      .pointRadius(() => 3);
+
+    const svg = d3
+      .select(globeElement)
+      .append("svg")
+      .attr("class", "globe-svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    state.globe.svg = svg;
+
+    state.globe.sphereLayer = svg
+      .append("g")
+      .attr("class", "globe-sphere-layer");
+
+    state.globe.graticuleLayer = svg
+      .append("g")
+      .attr("class", "globe-graticule-layer");
+
+    state.globe.regionLayer = svg
+      .append("g")
+      .attr("class", "globe-region-layer");
+
+    state.globe.placeLayer = svg
+      .append("g")
+      .attr("class", "globe-place-layer");
+
+    state.globe.sphereLayer
+      .append("path")
+      .attr("class", "globe-sphere")
+      .datum({ type: "Sphere" });
+
+    state.globe.graticuleLayer
+      .append("path")
+      .attr("class", "globe-graticule")
+      .datum(d3.geoGraticule10());
+
+    const drag = d3
+      .drag()
+      .on("start", () => {
+        state.globe.dragging = true;
+        stopGlobeAutoRotate();
+      })
+      .on("drag", () => {
+        const event = d3.event;
+
+        if (!event) {
+          return;
+        }
+
+        const rotate =
+          state.globe.projection.rotate();
+
+        const scaleFactor =
+          state.globe.projection.scale() /
+          Math.max(
+            state.globe.baseScale,
+            1
+          );
+
+        state.globe.projection.rotate([
+          rotate[0] +
+            event.dx *
+              CONFIG.globe.dragSensitivity /
+              Math.max(scaleFactor, 0.4),
+          Math.max(
+            -90,
+            Math.min(
+              90,
+              rotate[1] -
+                event.dy *
+                  CONFIG.globe.dragSensitivity /
+                  Math.max(scaleFactor, 0.4)
+            )
+          ),
+          rotate[2]
+        ]);
+
+        renderGlobeView();
+      })
+      .on("end", () => {
+        state.globe.dragging = false;
+      });
+
+    svg.call(drag);
+
+    svg.on("wheel", event => {
+      event.preventDefault();
+
+      const direction =
+        event.deltaY < 0 ? 1.12 : 1 / 1.12;
+
+      state.globe.scale = Math.max(
+        CONFIG.globe.minScaleFactor,
+        Math.min(
+          CONFIG.globe.maxScaleFactor,
+          state.globe.scale * direction
+        )
+      );
+
+      state.globe.projection.scale(
+        state.globe.baseScale *
+          state.globe.scale
+      );
+
+      renderGlobeView();
+    }, { passive: false });
+
+    svg.on("click", () => {
+      if (state.selectedEntity) {
+        selectEntityByName(null);
+      }
+    });
+
+    renderGlobeView();
+  }
+
+
+  function renderGlobeView() {
+    if (!state.globe.svg) {
+      return;
+    }
+
+    const path = state.globe.path;
+
+    state.globe.sphereLayer
+      .select("path.globe-sphere")
+      .attr("d", path);
+
+    state.globe.graticuleLayer
+      .select("path.globe-graticule")
+      .attr("d", path);
+
+    const features =
+      (
+        state.currentMap &&
+        Array.isArray(
+          state.currentMap.features
+        )
+          ? state.currentMap.features
+          : []
+      ).filter(isFeatureVisibleOnGlobe);
+
+    const regions = state.globe.regionLayer
+      .selectAll("path.historical-region")
+      .data(features, featureKey);
+
+    regions
+      .enter()
+      .append("path")
+      .attr("d", path)
+      .attr("data-name", getFeatureName)
+      .attr("fill", getFeatureColor)
+      .on("mouseenter", handleFeatureEnter)
+      .on("mousemove", handleFeatureMove)
+      .on("mouseleave", handleFeatureLeave)
+      .on("click", function(feature) {
+        if (d3.event) {
+          d3.event.stopPropagation();
+        }
+
+        selectEntityByName(
+          getFeatureName(feature)
+        );
+      })
+      .merge(regions)
+      .attr("d", path)
+      .attr("data-name", getFeatureName)
+      .attr("fill", getFeatureColor)
+      .attr("class", featureClass);
+
+    regions.exit().remove();
+
+    renderGlobePlaces();
+  }
+
+
+  function renderGlobePlaces() {
+    if (!state.globe.placeLayer) {
+      return;
+    }
+
+    const path = state.globe.path;
+
+    const visible = getVisiblePlaces()
+      .filter(isFeatureVisibleOnGlobe);
+
+    const places = state.globe.placeLayer
+      .selectAll("path.historical-place")
+      .data(
+        visible,
+        placeKey
+      );
+
+    places
+      .enter()
+      .append("path")
+      .attr(
+        "class",
+        "historical-place"
+      )
+      .on(
+        "mouseenter",
+        handlePlaceEnter
+      )
+      .on(
+        "mouseleave",
+        handlePlaceLeave
+      )
+      .merge(places)
+      .attr("d", feature => {
+        const coordinates =
+          getCoordinates(feature);
+
+        if (!coordinates) {
+          return null;
+        }
+
+        return path({
+          type: "Point",
+          coordinates
+        });
+      });
+
+    places.exit().remove();
+  }
+
+
+  function startGlobeAutoRotate() {
+    stopGlobeAutoRotate();
+
+    let previous = Date.now();
+
+    state.globe.autoRotateTimer =
+      window.setInterval(() => {
+
+        if (
+          state.globe.dragging ||
+          state.view !== "globe" ||
+          !state.globe.projection
+        ) {
+          previous = Date.now();
+          return;
+        }
+
+        const now = Date.now();
+
+        const elapsed =
+          (now - previous) / 1000;
+
+        previous = now;
+
+        const rotate =
+          state.globe.projection.rotate();
+
+        state.globe.projection.rotate([
+          rotate[0] +
+            elapsed *
+              CONFIG.globe
+                .autoRotateDegreesPerSecond,
+          rotate[1],
+          rotate[2]
+        ]);
+
+        renderGlobeView();
+      }, 50);
+  }
+
+
+  function stopGlobeAutoRotate() {
+    if (state.globe.autoRotateTimer) {
+      clearInterval(
+        state.globe.autoRotateTimer
+      );
+
+      state.globe.autoRotateTimer = null;
+    }
+  }
+
+
+  /* ----------------------------------------------------------
+     VIEW SWITCHING
+
+     Exactly one view is visible at a time:
+       "atlas" -> flat D3 map (default)
+       "map"   -> Leaflet slippy map
+       "globe" -> D3 orthographic 3D globe
+     ---------------------------------------------------------- */
+
+  function setView(view) {
+    if (!CONFIG.views.includes(view)) {
+      return;
+    }
+
+    state.view = view;
+
+    if (view === "map") {
+      initializeLeaflet();
+    }
+
+    if (view === "globe") {
+      initializeGlobe();
+    }
+
+    document
+      .querySelectorAll(".map-view")
+      .forEach(element => {
+        element.classList.toggle(
+          "active",
+          element.id ===
+            viewElementId(view)
+        );
+      });
+
+    document
+      .querySelectorAll(".view-button")
+      .forEach(button => {
+        button.classList.toggle(
+          "active",
+          button.dataset.view === view
+        );
+      });
+
+    if (globeHintElement) {
+      globeHintElement.hidden =
+        view !== "globe";
+    }
+
+    if (view === "globe") {
+      startGlobeAutoRotate();
+    } else {
+      stopGlobeAutoRotate();
+    }
+
+    if (
+      view === "map" &&
+      state.leaflet.map
+    ) {
+      /*
+        Leaflet must recompute its size after being
+        un-hidden, then be re-centered on the data.
+      */
+
+      state.leaflet.map.invalidateSize();
+
+      renderLeafletView();
+    } else {
+      renderLeafletView();
+    }
+
+    if (view === "globe") {
+      renderGlobeView();
+    }
+
+    updateURLState();
+  }
+
+
+  function viewElementId(view) {
+    if (view === "map") {
+      return leafletElement
+        ? leafletElement.id
+        : "leafletMap";
+    }
+
+    if (view === "globe") {
+      return globeElement
+        ? globeElement.id
+        : "globe";
+    }
+
+    return mapElement
+      ? mapElement.id
+      : "map";
+  }
+
+
+  function initializeViewSwitch() {
+    if (!viewSwitchElement) {
+      return;
+    }
+
+    viewSwitchElement
+      .querySelectorAll(".view-button")
+      .forEach(button => {
+        button.addEventListener(
+          "click",
+          () => setView(button.dataset.view)
+        );
+      });
+  }
+
+
+  /* ----------------------------------------------------------
+     ENTITY SELECTION (SHARED BY ALL VIEWS)
+     ---------------------------------------------------------- */
+
+  function selectEntityByName(name) {
+    state.selectedEntity =
+      name && state.selectedEntity !== name
+        ? name
+        : null;
+
+    renderMap();
+    updateEntityList();
+    updateMapInfoPanel();
+    updateURLState();
+  }
+
+
+  function updateMapInfoPanel() {
+    const panel = $("#mapInfo");
+
+    if (!panel) {
+      return;
+    }
+
+    const title = $("#mapInfoTitle");
+    const content = $("#mapInfoContent");
+
+    if (!state.selectedEntity) {
+      panel.classList.remove("visible");
+      return;
+    }
+
+    if (title) {
+      title.textContent = state.selectedEntity;
+    }
+
+    if (content) {
+      const feature =
+        state.currentFeatures.find(
+          candidate =>
+            getFeatureName(candidate) ===
+            state.selectedEntity
+        );
+
+      const props =
+        (feature && feature.properties) || {};
+
+      const rows = [];
+
+      rows.push(
+        `<div>${escapeHtml(
+          formatYear(state.currentYear)
+        )}</div>`
+      );
+
+      if (
+        props.SUBJECTO &&
+        props.SUBJECTO !== state.selectedEntity
+      ) {
+        rows.push(
+          `<div>Authority: ${escapeHtml(
+            props.SUBJECTO
+          )}</div>`
+        );
+      }
+
+      if (props.PARTOF) {
+        rows.push(
+          `<div>Part of: ${escapeHtml(
+            props.PARTOF
+          )}</div>`
+        );
+      }
+
+      if (props.BORDERPRECISION) {
+        const labels = {
+          1: "Approximate",
+          2: "Moderately precise",
+          3: "Precise"
+        };
+
+        const label =
+          labels[Number(props.BORDERPRECISION)] ||
+          props.BORDERPRECISION;
+
+        rows.push(
+          `<div>Border confidence: ${escapeHtml(
+            String(label)
+          )}</div>`
+        );
+      }
+
+      content.innerHTML = rows.join("");
+    }
+
+    panel.classList.add("visible");
   }
 
 
@@ -1725,11 +2887,7 @@
         if (
           state.selectedEntity
         ) {
-          state.selectedEntity =
-            null;
-
-          renderMap();
-          updateEntityList();
+          selectEntityByName(null);
         }
       }
     );
@@ -1839,6 +2997,7 @@
       initializeKeyboard();
       initializeURLSync();
       initializeMapClick();
+      initializeViewSwitch();
 
       /*
         Places are optional. Loading them in
@@ -1865,6 +3024,16 @@
 
       const urlState =
         readURLState();
+
+      /*
+        Restore the requested view (?view=map|globe)
+        before the first map loads so it renders into
+        the correct view from the start.
+      */
+
+      if (urlState.view) {
+        setView(urlState.view);
+      }
 
       let initialIndex =
         findInitialYear();
@@ -1990,6 +3159,8 @@
 
     togglePlay: togglePlayback,
 
+    setView,
+
     getState() {
       return {
         year:
@@ -2006,6 +3177,9 @@
 
         playing:
           state.playing,
+
+        view:
+          state.view,
 
         featureCount:
           state.currentFeatures.length

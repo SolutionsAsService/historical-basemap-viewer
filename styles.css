@@ -393,7 +393,7 @@ a {
    Brand
    -------------------------------------------------------------------------- */
 
-.atlas-brand {
+.brand {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -403,7 +403,7 @@ a {
   user-select: none;
 }
 
-.atlas-brand-mark {
+.brand-mark {
   width: 28px;
   height: 28px;
 
@@ -412,7 +412,7 @@ a {
   display: grid;
   place-items: center;
 
-  color: var(--foreground-strong);
+  color: var(--background);
 
   background: var(--foreground-strong);
 
@@ -421,24 +421,12 @@ a {
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.2);
 
+  font-size: 13px;
+
   overflow: hidden;
 }
 
-.atlas-brand-mark::before {
-  content: "";
-
-  width: 13px;
-  height: 13px;
-
-  border:
-    1.5px solid var(--background);
-
-  border-radius: 50%;
-
-  opacity: 0.85;
-}
-
-.atlas-brand h1 {
+.brand h1 {
   margin: 0;
 
   color: var(--foreground-strong);
@@ -449,10 +437,10 @@ a {
   line-height: 1;
 }
 
-.atlas-brand span {
+.brand-text p {
   display: block;
 
-  margin-top: 3px;
+  margin: 3px 0 0;
 
   color: var(--foreground-subtle);
 
@@ -467,7 +455,7 @@ a {
    Current year
    -------------------------------------------------------------------------- */
 
-.atlas-year {
+.header-center {
   position: absolute;
 
   left: 50%;
@@ -475,7 +463,9 @@ a {
 
   transform:
     translate(-50%, -50%);
+}
 
+.current-year {
   color: var(--foreground-strong);
 
   font-family: var(--font-serif);
@@ -492,7 +482,7 @@ a {
    Header actions
    -------------------------------------------------------------------------- */
 
-.atlas-header-actions {
+.header-actions {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -500,6 +490,52 @@ a {
   min-width: 220px;
 
   justify-content: flex-end;
+}
+
+
+/* --------------------------------------------------------------------------
+   View switch (Atlas / Map / Globe)
+   -------------------------------------------------------------------------- */
+
+.view-switch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  padding: 2px;
+  margin-right: var(--space-1);
+
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.view-button {
+  padding: 4px 11px;
+
+  color: var(--foreground-subtle);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+
+  cursor: pointer;
+
+  transition:
+    color var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out);
+}
+
+.view-button:hover {
+  color: var(--foreground);
+}
+
+.view-button.active {
+  color: var(--atlas-accent-hover);
+  background: var(--atlas-accent-muted);
+  border-color: var(--atlas-accent-border);
 }
 
 
@@ -523,7 +559,9 @@ a {
 
 .header-button,
 .map-button,
+.map-control,
 .timeline-button,
+.timeline-play,
 .icon-button {
   position: relative;
 
@@ -559,7 +597,9 @@ a {
 
 .header-button:hover,
 .map-button:hover,
+.map-control:hover,
 .timeline-button:hover,
+.timeline-play:hover,
 .icon-button:hover {
   color: var(--foreground-strong);
 
@@ -572,14 +612,18 @@ a {
 
 .header-button:active,
 .map-button:active,
+.map-control:active,
 .timeline-button:active,
+.timeline-play:active,
 .icon-button:active {
   transform: translateY(1px);
 }
 
 .header-button:disabled,
 .map-button:disabled,
+.map-control:disabled,
 .timeline-button:disabled,
+.timeline-play:disabled,
 .icon-button:disabled {
   color: var(--foreground-disabled);
 
@@ -759,7 +803,7 @@ a {
    Sidebar header
    -------------------------------------------------------------------------- */
 
-.sidebar-top {
+.sidebar-section {
   flex: 0 0 auto;
 
   padding:
@@ -769,30 +813,79 @@ a {
     1px solid var(--border);
 }
 
-.sidebar-heading {
+.section-label {
+  display: block;
+
+  color: var(--foreground-subtle);
+
+  font-size: 9px;
+  font-weight: 550;
+
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.section-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: var(--space-3);
+  padding: 0 var(--space-2);
+
+  margin-bottom: var(--space-2);
 }
 
-.sidebar-heading h2 {
-  margin: 0;
-
-  color: var(--foreground-strong);
-
-  font-size: var(--text-md);
-  font-weight: 550;
-
-  letter-spacing: -0.01em;
-}
-
-.sidebar-heading span {
+.section-count {
   color: var(--foreground-subtle);
 
   font-family: var(--font-mono);
   font-size: 10px;
+}
+
+.entities-section {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: var(--space-2) 0;
+}
+
+.date-heading {
+  margin-bottom: var(--space-2);
+}
+
+.date-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.sidebar-year {
+  color: var(--foreground-strong);
+
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+
+  line-height: var(--line-tight);
+}
+
+.date-context {
+  color: var(--foreground-subtle);
+
+  font-size: var(--text-xs);
+}
+
+.empty-state {
+  padding: var(--space-4) var(--space-3);
+
+  color: var(--foreground-subtle);
+
+  font-size: var(--text-xs);
+  text-align: center;
 }
 
 
@@ -800,13 +893,15 @@ a {
    11. SEARCH INPUT
    ========================================================================== */
 
-.search-wrapper {
+.search-box {
   position: relative;
 
   width: 100%;
+
+  margin-top: var(--space-3);
 }
 
-.search-wrapper::before {
+.search-box::before {
   content: "";
 
   position: absolute;
@@ -827,7 +922,7 @@ a {
   pointer-events: none;
 }
 
-.search-wrapper::after {
+.search-box::after {
   content: "";
 
   position: absolute;
@@ -846,6 +941,10 @@ a {
   background: var(--foreground-subtle);
 
   pointer-events: none;
+}
+
+.search-box .search-icon {
+  display: none;
 }
 
 #search {
@@ -1102,22 +1201,74 @@ a {
     var(--foreground-muted);
 }
 
+.legend-line.precision-low,
 .legend-line.low {
   opacity: 0.3;
 }
 
+.legend-line.precision-medium,
 .legend-line.medium {
   opacity: 0.6;
 }
 
+.legend-line.precision-high,
 .legend-line.high {
   opacity: 1;
 }
 
+.legend {
+  margin-top: var(--space-2);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+
+  gap: var(--space-2);
+
+  margin: 5px 0;
+
+  color: var(--foreground-subtle);
+
+  font-size: 10px;
+}
+
 
 /* ==========================================================================
-   15. MAP
+   15. MAP VIEWS
+
+   Three stacked views share one container; exactly one is
+   visible at a time (header view switch):
+     #map        -> D3 flat atlas
+     #leafletMap -> Leaflet slippy map
+     #globe      -> D3 orthographic globe
    ========================================================================== */
+
+.map-view-stack {
+  position: relative;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+.map-view {
+  position: absolute;
+
+  inset: 0;
+
+  display: none;
+
+  overflow: hidden;
+
+  background:
+    #111413;
+}
+
+.map-view.active {
+  display: block;
+}
 
 #map {
   position: relative;
@@ -1185,9 +1336,21 @@ a {
    16. D3 MAP FEATURES
    ========================================================================== */
 
-.country {
+/*
+   Historical regions are rendered by app.js with the
+   class .historical-region plus a border-confidence
+   class derived from BORDERPRECISION:
+     .precision-1 -> approximate (dashed, translucent)
+     .precision-2 -> moderately precise
+     .precision-3 -> precise
+*/
+
+.historical-region {
   fill:
     #8e8875;
+
+  fill-opacity:
+    0.92;
 
   stroke:
     rgba(8, 10, 9, 0.75);
@@ -1198,42 +1361,113 @@ a {
   vector-effect:
     non-scaling-stroke;
 
+  cursor: pointer;
+
   transition:
     fill 120ms ease,
-    opacity 120ms ease,
+    fill-opacity 120ms ease,
     filter 120ms ease;
 }
 
-.country:hover {
+.historical-region:hover,
+.historical-region.hovered {
   fill:
     #b4aa8f;
 
+  fill-opacity:
+    1;
+
   filter:
     brightness(1.08);
+}
+
+.historical-region.selected {
+  fill:
+    var(--atlas-accent);
+
+  fill-opacity:
+    0.95;
+
+  stroke:
+    var(--atlas-accent-hover);
+
+  stroke-width:
+    1.4px;
+}
+
+.historical-region.search-match {
+  stroke:
+    var(--atlas-accent);
+
+  stroke-width:
+    1.2px;
+}
+
+.historical-region.precision-1 {
+  fill-opacity:
+    0.58;
+
+  stroke-dasharray:
+    3 3;
+}
+
+.historical-region.precision-2 {
+  fill-opacity:
+    0.78;
+}
+
+.historical-region.precision-3 {
+  fill-opacity:
+    0.95;
+}
+
+
+/* --------------------------------------------------------------------------
+   Border overlay layer (drawn above the fills)
+   -------------------------------------------------------------------------- */
+
+.historical-border {
+  fill: none;
+
+  stroke:
+    rgba(8, 10, 9, 0.6);
+
+  stroke-width:
+    0.5px;
+
+  vector-effect:
+    non-scaling-stroke;
+
+  pointer-events: none;
+}
+
+
+/* --------------------------------------------------------------------------
+   Historical settlements (places.geojson)
+   -------------------------------------------------------------------------- */
+
+.historical-place {
+  fill:
+    var(--atlas-accent-hover);
+
+  fill-opacity:
+    0.85;
+
+  stroke:
+    rgba(10, 10, 10, 0.75);
+
+  stroke-width:
+    0.6px;
+
+  vector-effect:
+    non-scaling-stroke;
 
   cursor: pointer;
 }
 
-.country.selected {
-  fill:
-    var(--atlas-accent);
-}
-
-.country.low-confidence {
-  opacity: 0.48;
-}
-
-.country.medium-confidence {
-  opacity: 0.72;
-}
-
-.country.high-confidence {
-  opacity: 1;
-}
-
-.country.boundary-uncertain {
-  stroke-dasharray:
-    2 2;
+.historical-place:hover {
+  fill-opacity:
+    1;
 }
 
 
@@ -1275,7 +1509,8 @@ a {
     blur(10px);
 }
 
-.map-button {
+.map-button,
+.map-control {
   width: 30px;
   height: 30px;
 
@@ -1295,7 +1530,8 @@ a {
   font-size: 15px;
 }
 
-.map-button:hover {
+.map-button:hover,
+.map-control:hover {
   background:
     rgba(255, 255, 255, 0.07);
 
@@ -1303,7 +1539,8 @@ a {
     rgba(255, 255, 255, 0.05);
 }
 
-.map-button.reset {
+.map-button.reset,
+.map-control:last-child {
   margin-top: var(--space-1);
 
   font-size: 12px;
@@ -1351,8 +1588,30 @@ a {
     var(--ease-out);
 }
 
-#mapInfo[hidden] {
+#mapInfo[hidden],
+#mapInfo:not(.visible) {
   display: none;
+}
+
+.map-info-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: var(--space-1);
+}
+
+.info-kicker {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--atlas-accent);
+
+  font-size: 9px;
+  font-weight: 550;
+
+  letter-spacing: 0.14em;
 }
 
 #mapInfoTitle {
@@ -1458,7 +1717,7 @@ a {
 
   inset: 0;
 
-  z-index: 25;
+  z-index: 800;
 
   display: flex;
   align-items: center;
@@ -1538,7 +1797,7 @@ a {
 
   inset: 0;
 
-  z-index: 25;
+  z-index: 800;
 
   display: flex;
   align-items: center;
@@ -1640,7 +1899,8 @@ a {
     var(--space-3);
 }
 
-.timeline-title h2 {
+.timeline-title h2,
+.timeline-title strong {
   margin: 0;
 
   color:
@@ -1656,9 +1916,24 @@ a {
     -0.005em;
 }
 
-#timelineYearLabel {
+.timeline-kicker {
   color:
     var(--foreground-subtle);
+
+  font-size:
+    9px;
+
+  font-weight:
+    550;
+
+  letter-spacing:
+    0.09em;
+}
+
+#timelineYearLabel,
+.timeline-current-year {
+  color:
+    var(--atlas-accent);
 
   font-family:
     var(--font-mono);
@@ -1698,7 +1973,8 @@ a {
     rgba(255, 255, 255, 0.035);
 }
 
-#playButton {
+#playButton,
+.timeline-play {
   min-width:
     64px;
 
@@ -1712,7 +1988,8 @@ a {
     var(--border-strong);
 }
 
-#playButton:hover {
+#playButton:hover,
+.timeline-play:hover {
   background:
     rgba(255, 255, 255, 0.09);
 }
@@ -1722,7 +1999,8 @@ a {
    22. TIMELINE TRACK
    ========================================================================== */
 
-.timeline-track {
+.timeline-track,
+.timeline-rail {
   position: relative;
 
   width: 100%;
@@ -1878,7 +2156,7 @@ a {
   height: 8px;
 
   background:
-    rgba(255, 255, 255, 0.28);
+    var(--atlas-accent-border);
 }
 
 .timeline-tick-label {
@@ -1910,23 +2188,58 @@ a {
 #timelineLabels {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   gap:
     var(--space-1);
 
   margin-top:
-    var(--space-3);
+    var(--space-2);
+}
+
+#timelineLabels span {
+  color:
+    var(--foreground-subtle);
+
+  font-family:
+    var(--font-mono);
+
+  font-size:
+    9px;
+}
+
+#timelineCurrent {
+  color:
+    var(--atlas-accent);
+}
+
+
+/* --------------------------------------------------------------------------
+   Era shortcut buttons (Prehistory -> Contemporary)
+   -------------------------------------------------------------------------- */
+
+.timeline-periods {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap:
+    var(--space-1);
+
+  margin-top:
+    var(--space-2);
 
   overflow-x: auto;
 
   scrollbar-width: none;
 }
 
-#timelineLabels::-webkit-scrollbar {
+.timeline-periods::-webkit-scrollbar {
   display: none;
 }
 
-.timeline-period {
+.timeline-period,
+.period-button {
   flex:
     0 0 auto;
 
@@ -1964,7 +2277,8 @@ a {
     border-color var(--duration-normal) var(--ease-out);
 }
 
-.timeline-period:hover {
+.timeline-period:hover,
+.period-button:hover {
   color:
     var(--foreground);
 
@@ -1975,20 +2289,22 @@ a {
     var(--border);
 }
 
-.timeline-period:active {
+.timeline-period:active,
+.period-button:active {
   background:
     rgba(255, 255, 255, 0.07);
 }
 
-.timeline-period.active {
+.timeline-period.active,
+.period-button.active {
   color:
-    var(--foreground-strong);
+    var(--atlas-accent-hover);
 
   background:
-    rgba(255, 255, 255, 0.07);
+    var(--atlas-accent-muted);
 
   border-color:
-    var(--border-strong);
+    var(--atlas-accent-border);
 }
 
 
@@ -1997,16 +2313,22 @@ a {
    ========================================================================== */
 
 .atlas-footer {
-  position: absolute;
+  position: fixed;
 
   right:
     var(--space-3);
 
   bottom:
-    var(--space-2);
+    calc(var(--timeline-height) + var(--space-2));
 
   z-index:
-    var(--z-map-controls);
+    var(--z-timeline);
+
+  display: flex;
+  align-items: center;
+
+  gap:
+    6px;
 
   color:
     rgba(255, 255, 255, 0.28);
@@ -2022,6 +2344,10 @@ a {
 
   user-select:
     none;
+}
+
+.footer-divider {
+  opacity: 0.55;
 }
 
 
@@ -2239,6 +2565,397 @@ a {
 
 
 /* ==========================================================================
+   27b. ABOUT MODAL — MARKUP VARIANTS
+
+   index.html structures the dialog with .modal-dialog /
+   .modal-header / .modal-content / .panel-close instead of
+   the .about-card variant above; these rules bridge both.
+   ========================================================================== */
+
+.modal-dialog {
+  position: relative;
+
+  width:
+    min(560px, 100%);
+
+  max-height:
+    min(700px, calc(100vh - 40px));
+
+  padding:
+    var(--space-6);
+
+  overflow-y:
+    auto;
+
+  background:
+    var(--surface-raised);
+
+  border:
+    1px solid var(--border-strong);
+
+  border-radius:
+    var(--radius-xl);
+
+  box-shadow:
+    var(--shadow-lg);
+
+  animation:
+    atlas-modal-enter
+    var(--duration-slow)
+    var(--ease-out);
+}
+
+.modal-backdrop {
+  position: absolute;
+
+  inset: 0;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom:
+    var(--space-4);
+}
+
+.modal-header h2 {
+  margin: 0;
+
+  color: var(--foreground-strong);
+
+  font-family: var(--font-serif);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+
+  letter-spacing: -0.01em;
+}
+
+.modal-content p {
+  margin:
+    0 0 var(--space-3);
+
+  color: var(--foreground-muted);
+
+  font-size: var(--text-sm);
+  line-height: var(--line-relaxed);
+}
+
+.panel-close {
+  width: 28px;
+  height: 28px;
+
+  flex: 0 0 28px;
+
+  display: grid;
+  place-items: center;
+
+  color: var(--foreground-subtle);
+
+  background: transparent;
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+
+  cursor: pointer;
+}
+
+.panel-close:hover {
+  color: var(--foreground);
+
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border);
+}
+
+.about-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap:
+    var(--space-3);
+
+  margin-top:
+    var(--space-4);
+}
+
+.about-stat {
+  padding:
+    var(--space-3);
+
+  background:
+    rgba(255, 255, 255, 0.03);
+
+  border:
+    1px solid var(--border-subtle);
+
+  border-radius:
+    var(--radius-md);
+}
+
+.about-stat strong {
+  display: block;
+
+  color: var(--foreground-strong);
+
+  font-size: var(--text-sm);
+  font-weight: 550;
+}
+
+.about-stat span {
+  color: var(--foreground-subtle);
+
+  font-size: var(--text-xs);
+}
+
+
+/* ==========================================================================
+   27c. TOOLTIP (shared by all views)
+   ========================================================================== */
+
+.atlas-tooltip {
+  position: fixed;
+
+  z-index:
+    1000;
+
+  max-width:
+    240px;
+
+  padding:
+    var(--space-2)
+    var(--space-3);
+
+  color:
+    var(--foreground);
+
+  background:
+    rgba(15, 15, 15, 0.95);
+
+  border:
+    1px solid var(--border-strong);
+
+  border-radius:
+    var(--radius-sm);
+
+  box-shadow:
+    var(--shadow-md);
+
+  font-size:
+    var(--text-xs);
+
+  line-height:
+    1.5;
+
+  pointer-events:
+    none;
+
+  transition:
+    opacity var(--duration-fast) ease;
+}
+
+.atlas-tooltip strong {
+  font-family:
+    var(--font-serif);
+
+  font-size:
+    var(--text-md);
+}
+
+.atlas-tooltip span {
+  color:
+    var(--foreground-muted);
+}
+
+
+/* ==========================================================================
+   27d. LEAFLET SLIPPY-MAP VIEW
+   ========================================================================== */
+
+.leaflet-view {
+  background:
+    #0c1116;
+}
+
+.leaflet-view.leaflet-container {
+  background:
+    #0c1116;
+
+  font: inherit;
+}
+
+.leaflet-view .leaflet-control-zoom {
+  border:
+    1px solid var(--border) !important;
+
+  border-radius:
+    var(--radius-md) !important;
+
+  overflow: hidden;
+
+  box-shadow:
+    var(--shadow-md);
+}
+
+.leaflet-view .leaflet-control-zoom a {
+  width: 30px !important;
+  height: 30px !important;
+
+  color:
+    var(--foreground-muted) !important;
+
+  background:
+    rgba(15, 15, 15, 0.92) !important;
+
+  border-bottom:
+    1px solid var(--border) !important;
+
+  line-height:
+    30px !important;
+}
+
+.leaflet-view .leaflet-control-zoom a:hover {
+  color:
+    var(--foreground-strong) !important;
+
+  background:
+    rgba(28, 28, 28, 0.98) !important;
+}
+
+.leaflet-entity-tooltip {
+  color:
+    var(--foreground) !important;
+
+  background:
+    rgba(15, 15, 15, 0.95) !important;
+
+  border:
+    1px solid var(--border-strong) !important;
+
+  border-radius:
+    var(--radius-sm) !important;
+
+  box-shadow:
+    var(--shadow-md) !important;
+
+  font-family:
+    var(--font-serif) !important;
+
+  font-size:
+    var(--text-sm) !important;
+}
+
+.leaflet-entity-tooltip::before {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+   27e. GLOBE VIEW (3D orthographic)
+   ========================================================================== */
+
+.globe-view {
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(208, 168, 92, 0.045),
+      transparent 55%
+    ),
+    #05070a;
+}
+
+.globe-svg {
+  display: block;
+
+  cursor: grab;
+}
+
+.globe-svg:active {
+  cursor: grabbing;
+}
+
+.globe-sphere {
+  fill:
+    #0d151d;
+
+  stroke:
+    rgba(208, 168, 92, 0.3);
+
+  stroke-width:
+    1px;
+}
+
+.globe-graticule {
+  fill: none;
+
+  stroke:
+    rgba(255, 255, 255, 0.07);
+
+  stroke-width:
+    0.5px;
+
+  vector-effect:
+    non-scaling-stroke;
+
+  pointer-events: none;
+}
+
+.globe-region-layer .historical-region {
+  stroke:
+    rgba(5, 7, 10, 0.6);
+}
+
+.globe-place-layer .historical-place {
+  pointer-events: none;
+}
+
+.globe-hint {
+  position: absolute;
+
+  z-index:
+    var(--z-map-controls);
+
+  bottom:
+    var(--space-3);
+
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  padding:
+    4px 11px;
+
+  color:
+    var(--foreground-subtle);
+
+  background:
+    rgba(15, 15, 15, 0.7);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    99px;
+
+  font-size:
+    10px;
+
+  letter-spacing:
+    0.05em;
+
+  pointer-events:
+    none;
+}
+
+.globe-hint[hidden] {
+  display: none;
+}
+
+
+/* ==========================================================================
    28. DATA / CODE TYPOGRAPHY
    ========================================================================== */
 
@@ -2328,11 +3045,11 @@ pre {
     --sidebar-width: 250px;
   }
 
-  .atlas-brand {
+  .brand {
     min-width: 180px;
   }
 
-  .atlas-header-actions {
+  .header-actions {
     min-width: 180px;
   }
 
@@ -2356,29 +3073,30 @@ pre {
     --timeline-height: 168px;
   }
 
-  .atlas-brand span {
+  .brand-text p {
     display: none;
   }
 
-  .atlas-brand {
+  .brand {
     min-width: auto;
   }
 
-  .atlas-header-actions {
+  .header-actions {
     min-width: auto;
   }
 
-  .atlas-year {
+  .current-year {
     font-size:
       var(--text-md);
   }
 
-  .sidebar-top {
+  .sidebar-section {
     padding:
       var(--space-3);
   }
 
-  .border-legend {
+  .border-legend,
+  .legend-section {
     padding:
       var(--space-3);
   }
@@ -2422,12 +3140,12 @@ pre {
       var(--space-3);
   }
 
-  .atlas-brand {
+  .brand {
     gap:
       var(--space-2);
   }
 
-  .atlas-brand-mark {
+  .brand-mark {
     width:
       26px;
 
@@ -2438,12 +3156,12 @@ pre {
       26px;
   }
 
-  .atlas-brand h1 {
+  .brand h1 {
     font-size:
       var(--text-sm);
   }
 
-  .atlas-year {
+  .header-center {
     position:
       static;
 
@@ -2455,14 +3173,24 @@ pre {
 
     margin-right:
       var(--space-2);
+  }
 
+  .current-year {
     font-size:
       var(--text-sm);
   }
 
-  .atlas-header-actions {
+  .header-actions {
     gap:
       var(--space-1);
+  }
+
+  .view-button {
+    padding:
+      4px 7px;
+
+    font-size:
+      10px;
   }
 
   .header-button {
@@ -2514,7 +3242,7 @@ pre {
      Map
      ------------------------------------------------------------------------ */
 
-  #map {
+  .map-view-stack {
     order:
       1;
 
@@ -2559,20 +3287,20 @@ pre {
       0 -8px 24px rgba(0, 0, 0, 0.16);
   }
 
-  .sidebar-top {
+  .sidebar-section {
     padding:
       var(--space-2)
       var(--space-3);
   }
 
-  .sidebar-heading {
+  .section-heading {
     margin-bottom:
       var(--space-2);
   }
 
-  .sidebar-heading h2 {
+  .section-label {
     font-size:
-      var(--text-sm);
+      8px;
   }
 
   #search {
@@ -2631,7 +3359,8 @@ pre {
       8px;
   }
 
-  .border-legend {
+  .border-legend,
+  .legend-section {
     display:
       none;
   }
@@ -2733,7 +3462,16 @@ pre {
       2px;
   }
 
-  .timeline-period {
+  .timeline-periods {
+    margin-top:
+      var(--space-2);
+
+    justify-content:
+      flex-start;
+  }
+
+  .timeline-period,
+  .period-button {
     height:
       30px;
   }
@@ -2766,12 +3504,12 @@ pre {
       10px;
   }
 
-  .atlas-brand h1 {
+  .brand h1 {
     font-size:
       12px;
   }
 
-  .atlas-brand-mark {
+  .brand-mark {
     width:
       24px;
 
@@ -2782,9 +3520,13 @@ pre {
       24px;
   }
 
-  .atlas-year {
+  .current-year {
     font-size:
       12px;
+  }
+
+  .view-switch {
+    display: none;
   }
 
   #sidebar {
@@ -2813,7 +3555,8 @@ pre {
       9px;
   }
 
-  .timeline-period {
+  .timeline-period,
+  .period-button {
     padding-left:
       7px;
 
@@ -2839,13 +3582,14 @@ pre {
       118px;
   }
 
-  .sidebar-top {
+  .sidebar-section {
     padding:
       6px
       10px;
   }
 
-  .sidebar-heading {
+  .section-heading,
+  .section-label {
     display:
       none;
   }
