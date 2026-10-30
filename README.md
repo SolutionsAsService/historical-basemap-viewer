@@ -1,229 +1,54 @@
-# Historical Boundaries Viewer  
-## (world countries and cultural regions)
+# Palimpsest — a historical atlas of world borders
 
-![world 1880 DRAFT ROUGH](img/historicalmaps-leaflet.png)
+An interactive atlas over the [historical-basemaps](https://github.com/aourednik/historical-basemaps) dataset: world borders from 123,000 BC to 2010, one GeoJSON snapshot per period, on a flat atlas, a slippy map or a globe.
 
-## Interactive Historical Atlas (this repo's viewer)
+![Historical borders in 1880](img/historicalmaps-leaflet.png)
 
-`index.html` + `app.js` + `styles.css` form a self-contained interactive
-**timeline + map** application over the GeoJSON dataset:
+## Pages
 
-- **Timeline** — a slider with one tick per available snapshot, era shortcut
-  buttons (Prehistory → Contemporary), play/pause animation, and ‹ › stepping
-  (arrow keys work too). The current year is shown in the header, sidebar and
-  timeline, and deep-linkable via `?year=1492`.
-- **Three map views**, switchable from the header and via `?view=`:
-  - **Atlas** — flat D3 map (Natural Earth projection) with pan/zoom,
-    tooltips, entity selection and an info panel.
-  - **Map** — a Leaflet slippy map. A graticule replaces modern web tiles so
-    historical borders are never overlaid on present-day geography (this also
-    keeps the app fully offline-capable).
-  - **Globe** — a 3D orthographic globe viewer (D3): drag to rotate, scroll to
-    zoom, with slow auto-rotation when idle.
-- **Historical regions** are colored by their controlling authority
-  (`SUBJECTO`) and styled by `BORDERPRECISION` (approximate borders are
-  dashed/translucent — see the Border confidence legend). Settlements from
-  `places.geojson` render in every view, filtered by the selected year.
+| Page | What |
+|---|---|
+| `site/index.html` | Home: the palimpsest stack (nine real snapshots laid one on another in 3D) and turning points to jump into |
+| `site/map.html` | The atlas: timeline, era jumps, Atlas / Map / Globe views, search, region details; deep links `?year=1492&view=globe` |
+| `site/eras.html` | Every snapshot as a small map, filterable by era |
+| `site/about.html` | Where the data comes from, how precise it is, how to correct it, how new snapshots arrive |
 
-Serve the folder with any static file server (e.g. `python3 -m http.server`)
-and open `index.html`.
+## How this fork stays mergeable with upstream
 
-> "For most of the past 5,000 years, kingdoms and empires were exceptional islands of political hierarchy, surrounded by much larger territories whose inhabitants systematically avoided fixed, overarching systems of authority." - Graeber and Wengrow, 2021, _The Dawn of Everything_
+This repository is a fork of `aourednik/historical-basemaps`, and it **never edits upstream's files**:
 
-This historical boundaries project aims at providing ready-to-use base maps for mapping historical data. It is __work in progress__: verify the maps by comparison to other sources before using in academic work. If you see errors, report them in the "issues" section.
+| Owned by upstream (never edited here) | Owned by the viewer |
+|---|---|
+| `geojson/`, `svg/`, `img/`, `examples/`, `lib/`, `scripts/`, `index.json`, `LICENSE`, `CONTRIBUTING.md` | `site/`, `tools/`, `.github/`, `index.html` (redirect), `vercel.json`, `.vercelignore`, `.gitattributes`, `.gitignore`, `DESIGN-LOG.md`, this `README.md` |
 
-```text
-Structure we're setting up
+`README.md` keeps our version on merge (`.gitattributes`: `README.md merge=ours`). Upstream's own CI keeps `index.json` in step with `geojson/`, and the viewer reads it as-is.
 
-This is deliberately more than a basic D3 map. The UI is now structured as:
-
-┌──────────────────────────────────────────────────────────────┐
-│  ◉ HISTORICAL ATLAS      1492 AD   [Atlas|Map|Globe]  ⌕  ?   │
-├───────────────┬──────────────────────────────────────────────┤
-│               │                                              │
-│ FIND PLACE    │                                              │
-│ ┌───────────┐ │                                              │
-│ │ Search... │ │                  HISTORICAL                  │
-│ └───────────┘ │                     MAP                      │
-│               │                                              │
-│ HISTORICAL    │                                              │
-│ 1492 AD       │                         +                    │
-│               │                         −                    │
-│ ENTITIES      │                         ◌                    │
-│               │                                              │
-│ Spain         │                                              │
-│ France        │                                              │
-│ Ottoman       │                                              │
-│ ...           │                                              │
-│               │                                              │
-│ BORDER        │                                              │
-│ ─ Precise     │                                              │
-│ - Approx.     │                                              │
-├───────────────┴──────────────────────────────────────────────┤
-│ CHRONOLOGY     Historical timeline       ‹  PLAY  ›          │
-│                                                              │
-│ ●──────●────────●──────●────────●────────●───────────────●  │
-│ Earliest            1492                       Present        │
-│                                                              │
-│ Prehistory Ancient Classical Medieval Early Modern Modern   │
-├──────────────────────────────────────────────────────────────┤
-│ Historical Atlas / Historical boundaries      42 regions     │
-└──────────────────────────────────────────────────────────────┘
-
-The key thing is that the HTML doesn't need to change much as we expand the application. We can add later:
-
-historical events
-wars
-battles
-rulers
-dynasties
-religions
-languages
-population
-economic data
-military strength
-migrations
-trade routes
-exploration routes
-colonial possessions
-treaties
-revolutions
-infrastructure
-cities
-archaeological sites
-custom user datasets
-
-all as additional timeline layers over the same geographic engine.
-
-
-
-```
-
-## Apps
-
-Several apps using the historical-basemaps dataset have been developped. A non-exhaustive list:
-
-- [Historic Borders](https://historicborders.app/): a web app with timeline, by Adam (GitHub user @ngrapple).
-- [Point in History](https://hanshack.com/point-in-history/): a web app to visualize the history of any point on the planet by Hans Hack.
-- A [web app on ourednik.info](https://ourednik.info/historicalmaps/app.html) (aplha release) alows you to exlore the dataset in alternative map projections.
-
-You'll find other [use examples with D3 and Leaflet](https://ourednik.info/historicalmaps/) on ourednik.info.
-
-## GeoJSON
-
-All maps are stored in the [_geojson_](https://github.com/aourednik/historical-basemaps/tree/master/geojson) format: single file per feature layer, human and machine readable, easy to import in [qGIS](https://github.com/qgis/QGIS) or use in [D3](https://github.com/d3) (see [d3v5_example.html](https://github.com/aourednik/historical-basemaps/tree/master/d3v5_example.html) as well as [d3v5_roughjs_example.html](https://github.com/aourednik/historical-basemaps/tree/master/d3v5_roughjs_example.html) with the additional use of [rough.js](https://github.com/pshihn/rough)). [Integration in Leaflet](https://ourednik.info/historicalmaps/leafletExample), OpenLayers et al. is also easy to achieve.
-
-### 📁 `index.json`
-
-A lightweight summary of the dataset is available in [`index.json`](./index.json). It lists:
-
-* The `year` and corresponding `.geojson` `filename`
-* The list of `countries` (based on `NAME` property) in each file
-
-This file is auto-generated on every commit via GitHub Actions and helps applications quickly query available years or filter by country without loading full files.
-
-Example:
-
-```json
-{
-  "year": 1492,
-  "filename": "world_1492.geojson",
-  "countries": ["Spain", "Portugal", "Inca Empire"]
-}
-```
-
-You can regenerate it manually by running:
+To bring in new datasets:
 
 ```bash
-node scripts/generateIndex.js
+python tools/sync_upstream.py --dry-run   # what upstream would bring
+python tools/sync_upstream.py             # merge it and rebuild the viewer's data
+git push
 ```
 
-### Polygons
+The script adds the `upstream` remote if it's missing, refuses to run on a dirty tree, stops before merging if upstream ever touches a viewer path, merges, warns about any snapshot missing from `index.json`, and rebuilds `site/data/` (the home stack, the era thumbnails and the counts) with `tools/build_slices.py`. The workflow `.github/workflows/sync-upstream.yml` does the same weekly (or on demand) on an `upstream-sync` branch and opens a pull request; it never pushes to `master`.
 
-Geocoding precision of multipolygons is adapted for mapping data on world/continent scale. The following fields are available in every file:
+Tested on 2026-10-30 by merging a simulated upstream commit that added a 2020 snapshot, regenerated `index.json` and edited upstream's README: no conflicts, our README kept, and the rebuilt data showed 55 snapshots ending at 2020 AD.
 
-* __NAME__: the name of the country or region; ideal for text labels
-* __SUBJECTO__: the name of the colonial power exercising authority on the country or region; the name of the region otherwise; ideal for choropleth colors
-* <span style="color:grey">__PARTOF__: when a region is part of a larger cultural area, e.g. Czechs as part of the Slavic tribes.</span>
-* <span style="color:grey">__BORDERPRECISION__ : ordinal values 1 (approximate), 2 (moderately precise) and 3 (determined by international law). Ideal for handling approximate border with blur intensity or other visual effect.</span>
+## Data loading
 
-### Points
+The pages live in `site/`; the data stays at the repository root where upstream keeps it. The atlas loads `../index.json` and `../geojson/…` first, and falls back to the same files on upstream through jsDelivr if they aren't there (for example if the site is deployed with `site/` as its root).
 
-The file called [_places.geojson_](https://github.com/aourednik/historical-basemaps/tree/master/places.geojson) contains locations of cities and other settlements. For now, it is only a draft and needs your help for completion. Places throughout history can be added to this single file. When used in visualisation software or code, it can be filtered by time fields:
+## Run locally
 
-* __name__ {string}: the toponym <span style="color:grey">(it would be great to have this as nested JSON object, [as suggested here](https://github.com/qgis/QGIS/issues/45330), for places whose toponym changed over time, but this is not yet handled by standard GIS; for now, create distinct points with identical coordinate for each _inhabitedSince_ to _inhabitedUntil_ period)</span>
-* __inhabitedSince__ {integer}: inhabited since year
-* __inhabitedUntil__ {integer}: inhabited until year, or NULL if it still is.
+```bash
+python -m http.server 8000      # from the repository root, then open http://localhost:8000/
+```
 
-![places](img/places.png)
+## Deploy
 
-## SVG
+Static, no install or build step. `vercel.json` serves the repository root (so `site/` and the data are both public); `.vercelignore` leaves out the SVGs, images and examples the site doesn't use. The root `index.html` redirects to `site/`. If the Vercel or Shadw root is set to `site/` instead, `site/vercel.json` applies and the atlas reads the data from upstream's CDN.
 
-The [maps in the Scalable Vector Graphics format](https://github.com/aourednik/historical-basemaps/tree/master/svg/) are the result of a conversion of GeoJSON files with the R script [_geojson2svg.Rmd_](https://github.com/aourednik/historical-basemaps/tree/master/geojson2svg.Rmd). By default, the script uses a "Natural Earth" projection, which can be changed by using another [PROJ string](https://proj.org/operations/projections/) than `natearth2` in `st_transform(geodata, "+proj=natearth2")`.
+## Data, licence and credits
 
-Please see these SVG files only as raw material editable with a vector drawing software for the needs of GIS-unsavvy users. __If you contribute to this Git repository, please edit directly - and only - the GeoJSON files__.
-
-![SVG map](https://raw.githubusercontent.com/aourednik/historical-basemaps/master/svg/world_1938.svg)
-
-## Conceptual limitations and disputed territories
-
-When using the data, keep in mind that
-
-1. historical boundaries are even more disputed than contemporary ones, that
-2. the actual concept of territory and national boundary becomes meaningful, in Europe, only since the [Peace of Westphalia](https://en.wikipedia.org/wiki/Peace_of_Westphalia) (1648), that
-3. areas of civilizations actually overlap, especially in ancient history, and that
-4. overlaying these ancient vector maps on contemporary physical maps can be misleading; rivers, lakes, shorelines _do_ change very much over millennia; think for instance about the evolution of the [Aral Sea](https://en.wikipedia.org/wiki/Aral_Sea) since the 1980s.
-
-Overlapping areas are usually dealt with as topological errors in traditional GIS, but some overlaps make sense in the case of this repository. Notwithstanding epistemological and historiographical concerns, the pragmatic bottom line is: vector GIS has points, polygons and lines. That's it. Nevertheless, when __redendering__, _transparent layers_ (opacity < 100%) and _blur effects_ is a convenient way to deal with fuzzy and overlapping borders of pre-modern societies.  
-
-![Fuzzy borders](img/fuzzy-borders.png)
-
-Visual distinction between precise and approximate borders can also be achieved on the same map. See [this D3js example](https://ourednik.info/historicalmaps/d3v5_FuzzyAndExactBorders_example.html).
-
-![Fuzzy borders](img/historicBorders_fuzzyNonFuzzy.png)
-
-## Projection
-
-The geodata are stored in the WGS 84 projection, EPSG:4326 (crs:OGC:1.3:CRS84). Coordinates are in LatLon, the projection is geographical. Consider reprojecting to show the maps on world scale, choosing a [projection with minimal area distortion](https://bl.ocks.org/syntagmatic/ba569633d51ebec6ec6e), such as the __Dymaxion__ (AirOcean) projection or the __Molweide__ projection. 
-
-![world 1880 DRAFT](img/world_1880.png)
-
-Most mapping software and algorithms reproject on the fly. Globe wrapping is also possible, [as illustrates ngrapples's app](https://historicborders.app/?view=globe):
-
-![world 1880 DRAFT](img/historical-globe.png)
-
-## Contributing
-
-You are welcome to contribute by making your forks and filing git pull requests. Further notes on contributing in [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Credits
-
-This project started as a collection of basemaps collected, adapted and converted from diverse sources, sometimes only available through the wayback machine. Among these sources, anonymous students from the "ThinkQuest Team C006628".
-
-## Some (rare) historical georefernced resources on the web
-
-* [CShapes by Niels Weidman](https://icr.ethz.ch/data/cshapes/), also available as an R package.
-* [GIS data : historical country boundaries](https://www.gislounge.com/find-gis-data-historical-country-boundaries/)
-* [Old Maps Online](https://www.oldmapsonline.org/en/Hokkaido).
-* [Native Land](https://native-land.ca). Contains notably maps of territorial conventions between colonizers and native populations in the Americas and Australia. User contributions possible via a GIS interface. These maps are also [available in GeoJSON format](https://native-land.ca/resources/api-docs/).
-
-## Other resources - not georeferenced or GIS files non-downloadable
-
-* [David Rumsey Map Collection](https://www.davidrumsey.com/): The most important historical maps repositoriy. Over 60000 ancient maps, some [reprojected on interactive globes](https://www.davidrumsey.com/view/interactive-globes).
-* [Ancient World Mapping Center at the University of North Carolina](http://awmc.unc.edu/wordpress/map-files/)
-* [Atlas of Human Evolution](http://atlasofhumanevolution.com/). A nice tool for the prehistory of the Homo species. Takes into account also the evolution of sea levels.
-* [Euratlas.net](https://www.euratlas.net/history/europe/). Mostly reliable but very old technology.
-* [Geacron.com](http://geacron.com). "Interactive World History Atlas since 3000 BC". A nice tool, but offering no possibility to extract polygons for use in a GIS. A commercial version of the program allows you to see a timeline.
-* [Wikimedia: Maps of the world showing history](https://commons.wikimedia.org/wiki/Category:Maps_of_the_world_showing_history)
-
-## Spatial mutations in theory and fiction published by the curator of this repository
-
-* [Ourednik, A. (2022) "The impossible territory and the maps of the boyar Kraiensky", in _Maps and Spaces_ (translation of "L’impossible territoire et les cartes du boyard Kraïenski" in GeoAgenda No. 4/2021.).](https://ourednik.info/maps/2022/04/27/the-impossible-territory-and-the-maps-of-the-boyar-kraiensky/) (research essay) - Unstable borders are a cartographer’s nightmare. The simple task of reporting on demographic changes quickly becomes a headache in a country whose municipalities merge, divide, and even change their spatial contours according to the projects of their inhabitants and councilors, who feel no pressing need of being aggregated on a national scale.
-
-* [Ourednik, A. (2019) _Hypertopie: de l'utopie à l'omniscience_, La Baconnière.](https://ourednik.info/en/textes/hypertopie) (essay, in French) - on the notion of _hypertopia_, comprising the "impossible here" of identitarian utopias and the collapse of contemporary space into an infinite _hit et nunc_.
-
-* [Ourednik, A. (2014), _The impossible here_](https://www.espacestemps.net/articles/the-impossible-here/) (research paper) - "Grain upon grain, one by one, and one day, suddenly, there’s a heap, a little heap, the impossible heap."
-
-* [Ourednik, A. (2015) _Les cartes du boyard Kraïenski_](https://ourednik.info/en/textes/boyard-kraienski) (novel, in French) -  a cartographer sent to map the eastern border or the European Union gets lost in a fictive country somewhere between Ukraine and Bulgaria...
-
-* [Ourednik, A. (2010) _L'habitant et la cohabitation dans les modèles de l'espace habité_ (2010), EPFL.](https://ourednik.info/essais.php?texte=phd) (PhD thesis, in French) - on the notion of codwelling in space and time. Central topic: changing spatial ontologies (_i.e._ the type and extent of things in space).
+Borders: André Ourednik and contributors, [historical-basemaps](https://github.com/aourednik/historical-basemaps), GPL-3.0 (see `LICENSE`). Borders are approximate and sometimes disputed; check other sources before academic use, and send corrections upstream (see `CONTRIBUTING.md`). Viewer and design: SolutionsAsService. The design record is in `DESIGN-LOG.md`.

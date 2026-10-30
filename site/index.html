@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palimpsest — A historical atlas of world borders</title>
+<meta name="description" content="World borders from 123,000 BC to 2010, stacked like pages written over one another. Open any year on a flat atlas, a slippy map or a globe.">
+<meta name="theme-color" content="#0d1422">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="index.html" aria-label="Palimpsest, home"><img src="favicon.svg" alt="" width="28" height="28"><span>Palimpsest</span></a>
+    <nav aria-label="Main">
+      <a href="map.html">Atlas</a>
+      <a href="eras.html">Eras</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-in">
+      <div class="hero-copy">
+        <p class="kicker">A historical atlas</p>
+        <h1 id="hero-title">Every border is written <em>over the last.</em></h1>
+        <p class="lede">A palimpsest is a page scraped clean and written on again, the old lines still showing through. These are the world's borders from <span data-meta="earliestLabel">123,000 BC</span> to <span data-meta="latestLabel">2010 AD</span>, <span data-meta="snapshots">54</span> snapshots in all, nine of them stacked here.</p>
+        <div class="actions">
+          <a class="btn btn-gold" href="map.html">Open the atlas</a>
+          <a class="btn btn-line" href="eras.html">Browse every era</a>
+        </div>
+      </div>
+
+      <figure class="stack-wrap" aria-labelledby="stack-cap">
+        <div class="stack" id="stack" role="list" aria-label="Snapshots in the stack"></div>
+        <figcaption id="stack-cap" class="sr-only">Nine world maps, from 2,000 BC at the bottom to 2010 AD at the top, stacked like sheets of a manuscript. Each opens that year in the atlas.</figcaption>
+        <div class="stack-ctrls">
+          <button class="btn btn-gold btn-sm" id="stack-scrape" type="button" aria-pressed="false">Scrape the stack</button>
+          <button class="btn btn-line btn-sm" id="stack-pause" type="button" aria-pressed="false">Pause</button>
+        </div>
+        <p class="stack-note">Equirectangular, Antarctica left out. A colour marks one authority within a sheet; the same colour on two sheets is a coincidence.</p>
+      </figure>
+    </div>
+    <ol class="core" id="core" aria-label="The years in the stack"></ol>
+  </section>
+
+  <section class="band">
+    <div class="wrap three">
+      <article>
+        <p class="kicker">Three ways to look</p>
+        <h2>Atlas, map, globe.</h2>
+        <p>A flat Natural Earth projection for the whole world at once, a slippy map to zoom into a coastline, and a globe to turn by hand. Every view shares the same year.</p>
+      </article>
+      <article>
+        <p class="kicker">Honest borders</p>
+        <h2>Faint where it's guessed.</h2>
+        <p>The dataset rates its borders, and mostly per era: older snapshots are marked approximate and drawn faint and dotted, recent ones precise and drawn solid. Colours follow who controlled a region within a year.</p>
+      </article>
+      <article>
+        <p class="kicker">Open data</p>
+        <h2>Built on a living dataset.</h2>
+        <p>The maps come from André Ourednik's <a href="https://github.com/aourednik/historical-basemaps" rel="noopener">historical-basemaps</a>, corrected by many contributors. New snapshots arrive here by a clean merge.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="band band-paper">
+    <div class="wrap">
+      <p class="kicker">Start somewhere</p>
+      <h2 class="h2">Jump into a turning point.</h2>
+      <ul class="jumps">
+        <li><a href="map.html?year=-323"><b>323 BC</b><span>Alexander's empire, the year he dies</span></a></li>
+        <li><a href="map.html?year=1279"><b>1279 AD</b><span>Mongol rule stretches across Eurasia</span></a></li>
+        <li><a href="map.html?year=1492"><b>1492 AD</b><span>The year Columbus reaches the Caribbean</span></a></li>
+        <li><a href="map.html?year=1815"><b>1815 AD</b><span>Europe redrawn at the Congress of Vienna</span></a></li>
+        <li><a href="map.html?year=1914"><b>1914 AD</b><span>Empires on the eve of the First World War</span></a></li>
+        <li><a href="map.html?year=1945"><b>1945 AD</b><span>The world at the end of the Second World War</span></a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap quote">
+      <blockquote>
+        <p>“For most of the past 5,000 years, kingdoms and empires were exceptional islands of political hierarchy, surrounded by much larger territories whose inhabitants systematically avoided fixed, overarching systems of authority.”</p>
+        <footer>David Graeber and David Wengrow, <cite>The Dawn of Everything</cite> (2021), quoted by the dataset's author</footer>
+      </blockquote>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p><strong>Palimpsest</strong> · borders from <a href="https://github.com/aourednik/historical-basemaps" rel="noopener">aourednik/historical-basemaps</a>, GPL-3.0. Historical borders are approximate; check other sources before academic use.</p>
+    <p><a href="about.html">About the data</a> · <a href="eras.html">Eras</a> · <a href="map.html">The atlas</a></p>
+  </div>
+</footer>
+<script src="js/home.js" defer></script>
+</body>
+</html>

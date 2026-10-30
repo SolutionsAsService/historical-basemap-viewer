@@ -1,0 +1,41 @@
+name: Sync upstream datasets
+
+# Weekly, or on demand: merge new data from aourednik/historical-basemaps on a branch and open a pull request.
+# It never pushes to master; a person reviews and merges the PR.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Merge upstream and rebuild the viewer's data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B upstream-sync
+          python tools/sync_upstream.py
+      - name: Open a pull request if anything came in
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "$(git rev-list --count origin/${{ github.event.repository.default_branch }}..HEAD)" = "0" ]; then
+            echo "Nothing new upstream."; exit 0
+          fi
+          git push --force origin upstream-sync
+          gh pr view upstream-sync >/dev/null 2>&1 || gh pr create --head upstream-sync \
+            --base "${{ github.event.repository.default_branch }}" \
+            --title "Sync new datasets from upstream" \
+            --body "Merged from aourednik/historical-basemaps by tools/sync_upstream.py, with the viewer's data rebuilt. Check the new snapshots on the Eras page before merging."

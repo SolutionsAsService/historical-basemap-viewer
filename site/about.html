@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About the data — Palimpsest</title>
+<meta name="description" content="Where the borders come from, how precise they are, how to correct them, and how new snapshots arrive.">
+<meta name="theme-color" content="#0d1422">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="index.html" aria-label="Palimpsest, home"><img src="favicon.svg" alt="" width="28" height="28"><span>Palimpsest</span></a>
+    <nav aria-label="Main">
+      <a href="map.html">Atlas</a>
+      <a href="eras.html">Eras</a>
+      <a href="about.html" aria-current="page">About</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="paper">
+  <div class="wrap prose">
+    <p class="kicker">About the data</p>
+    <h1 style="font-size:clamp(2.6rem,6vw,4.4rem);line-height:.95;margin:0">Where the lines come from.</h1>
+
+    <h2>The source</h2>
+    <p>Every border, region and settlement here comes from <a href="https://github.com/aourednik/historical-basemaps" rel="noopener">historical-basemaps</a>, a public dataset started by André Ourednik and corrected over the years by many contributors. It is released under the GNU General Public License v3, and so is this viewer. The maps are in WGS 84 (EPSG:4326), one GeoJSON file per snapshot, generalised for continent- and world-scale maps.</p>
+
+    <h2>How much to trust a border</h2>
+    <p>Each region carries a precision value, drawn three ways in the atlas. In practice the value is set mostly per snapshot: in this release every region of 1000 AD is rated approximate and every region of 1815 precise, so the line style tells you about the era more than about one border.</p>
+    <table>
+      <thead><tr><th scope="col">Value</th><th scope="col">Meaning</th><th scope="col">Drawn as</th></tr></thead>
+      <tbody>
+        <tr><td><code>3</code></td><td>Precise</td><td>Solid border, full colour</td></tr>
+        <tr><td><code>2</code></td><td>Moderately precise</td><td>Dashed border</td></tr>
+        <tr><td><code>1</code></td><td>Approximate</td><td>Faint dotted border, lighter fill</td></tr>
+      </tbody>
+    </table>
+    <p>Colours follow the controlling authority (<code>SUBJECTO</code>): a province is coloured as its empire. The dataset's author asks that the maps be checked against other sources before academic use.</p>
+    <p>Borders also carry a politics. Many territories are disputed today, and the dataset's own guidance is to draw each country as its own government sees it and let the overlaps show the dispute. Before the modern era, most of the land on any map belonged to no state at all.</p>
+
+    <h2>Correcting a border</h2>
+    <p>Corrections belong upstream, so everyone who uses the dataset gets them: open an issue or a pull request on <a href="https://github.com/aourednik/historical-basemaps" rel="noopener">aourednik/historical-basemaps</a>, editing only the GeoJSON (QGIS is the suggested editor). Once accepted there, the fix reaches this atlas with the next sync.</p>
+
+    <h2>How new snapshots arrive</h2>
+    <p>This viewer is a fork that never edits the dataset's own files. The data folders are byte-for-byte upstream's; the viewer lives in its own <code>site/</code> and <code>tools/</code> folders. So bringing in new snapshots is an ordinary, conflict-free merge:</p>
+<pre>python tools/sync_upstream.py</pre>
+    <p>That fetches upstream, merges it, checks that nothing in the viewer was touched, and rebuilds the home stack, the era thumbnails and the counts on these pages. A new snapshot appears on the timeline, the Eras page and the counts with no other change.</p>
+
+    <h2>Credits</h2>
+    <ul>
+      <li>Data: André Ourednik and contributors, <a href="https://github.com/aourednik/historical-basemaps" rel="noopener">historical-basemaps</a> (GPL-3.0).</li>
+      <li>Rendering: D3 and Leaflet, bundled with the site.</li>
+      <li>Quotation on the home page: David Graeber and David Wengrow, <cite>The Dawn of Everything</cite> (2021), as quoted in the dataset's README.</li>
+      <li>Viewer and design: SolutionsAsService.</li>
+    </ul>
+  </div>
+</main>
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p><strong>Palimpsest</strong> · <a href="map.html">The atlas</a> · <a href="eras.html">Eras</a></p>
+  </div>
+</footer>
+</body>
+</html>

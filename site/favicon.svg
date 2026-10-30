@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .bg { fill: #0d1422; }
+    .a { fill: #4b6a8a; }
+    .b { fill: #b7ae9d; }
+    .c { fill: #d9b26a; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #efe6d2; }
+      .a { fill: #8aa3bd; }
+      .b { fill: #6b6457; }
+      .c { fill: #9a6f1e; }
+    }
+  </style>
+  <rect class="bg" width="32" height="32" rx="7"/>
+  <path class="a" d="M16 22.5 L27 17 L16 11.5 L5 17 Z"/>
+  <path class="b" d="M16 18.5 L27 13 L16 7.5 L5 13 Z" opacity=".9"/>
+  <path class="c" d="M16 14.5 L27 9 L16 3.5 L5 9 Z"/>
+</svg>

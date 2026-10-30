@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every era — Palimpsest</title>
+<meta name="description" content="Every snapshot in the atlas, from 123,000 BC to 2010, as a small map. Open any of them.">
+<meta name="theme-color" content="#0d1422">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="index.html" aria-label="Palimpsest, home"><img src="favicon.svg" alt="" width="28" height="28"><span>Palimpsest</span></a>
+    <nav aria-label="Main">
+      <a href="map.html">Atlas</a>
+      <a href="eras.html" aria-current="page">Eras</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <div class="page-head">
+    <p class="kicker">Every snapshot</p>
+    <h1><span data-meta="snapshots">54</span> worlds, <em>in order.</em></h1>
+    <p class="lede">From <span data-meta="earliestLabel">123,000 BC</span> to <span data-meta="latestLabel">2010 AD</span>. The spacing is the dataset's: snapshots are thousands of years apart in prehistory and a few decades apart in recent centuries.</p>
+    <div class="filters" role="group" aria-label="Filter by era">
+      <button type="button" data-range="all" aria-pressed="true">All</button>
+      <button type="button" data-range="-200000,-3001" aria-pressed="false">Prehistory</button>
+      <button type="button" data-range="-3000,499" aria-pressed="false">Ancient</button>
+      <button type="button" data-range="500,1499" aria-pressed="false">Medieval</button>
+      <button type="button" data-range="1500,1799" aria-pressed="false">Early modern</button>
+      <button type="button" data-range="1800,2100" aria-pressed="false">Modern</button>
+    </div>
+  </div>
+  <ol class="eras" id="eras" aria-live="polite"></ol>
+</main>
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p><strong>Palimpsest</strong> · borders from <a href="https://github.com/aourednik/historical-basemaps" rel="noopener">aourednik/historical-basemaps</a>, GPL-3.0.</p>
+  </div>
+</footer>
+<script src="js/eras.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The atlas — Palimpsest</title>
+<meta name="description" content="Move through world borders from 123,000 BC to 2010 on a flat atlas, a slippy map or a globe.">
+<meta name="theme-color" content="#0d1422">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lib/leaflet/leaflet.css">
+<link rel="stylesheet" href="css/map.css">
+<script src="lib/d3.v5.min.js" defer></script>
+<script src="lib/leaflet/leaflet.js" defer></script>
+</head>
+<body class="map-page">
+<a class="skip" href="#search">Skip to the map controls</a>
+<div id="app" class="atlas-app">
+
+  <header class="atlas-header">
+    <a class="brand" href="index.html" aria-label="Palimpsest, home">
+      <img src="favicon.svg" alt="" width="28" height="28">
+      <span>Palimpsest</span>
+    </a>
+    <p id="yearLabel" class="current-year">Loading…</p>
+    <div class="header-actions">
+      <div id="viewSwitch" class="view-switch" role="group" aria-label="Map view">
+        <button class="view-button active" type="button" data-view="atlas">Atlas</button>
+        <button class="view-button" type="button" data-view="map">Map</button>
+        <button class="view-button" type="button" data-view="globe">Globe</button>
+      </div>
+      <nav class="header-links" aria-label="Site">
+        <a href="eras.html">Eras</a>
+        <a href="about.html">About the data</a>
+      </nav>
+      <button id="searchToggle" class="icon-button" type="button" aria-label="Find a place">⌕</button>
+      <button id="aboutButton" class="icon-button" type="button" aria-label="How to read the map">?</button>
+    </div>
+  </header>
+
+  <main class="atlas-main">
+    <aside id="sidebar" class="sidebar" aria-label="Map details">
+      <section class="sidebar-section">
+        <label class="side-kicker" for="search">Find a region</label>
+        <input id="search" class="search-input" type="search" placeholder="e.g. Ottoman, Song, Aztec" autocomplete="off">
+      </section>
+      <section class="sidebar-section entities-section">
+        <p class="side-kicker">Regions <span id="entityCount" class="count">0</span></p>
+        <div id="entityList" class="entity-list" role="list"></div>
+      </section>
+      <section class="sidebar-section">
+        <p class="side-kicker">Border precision</p>
+        <ul class="legend">
+          <li class="legend-item"><svg class="swatch" viewBox="0 0 30 16" aria-hidden="true"><rect class="historical-region precision-3" x="1" y="1" width="28" height="14" fill="hsl(200 30% 55%)"/></svg>Precise</li>
+          <li class="legend-item"><svg class="swatch" viewBox="0 0 30 16" aria-hidden="true"><rect class="historical-region precision-2" x="1" y="1" width="28" height="14" fill="hsl(200 30% 55%)"/></svg>Moderately precise</li>
+          <li class="legend-item"><svg class="swatch" viewBox="0 0 30 16" aria-hidden="true"><rect class="historical-region precision-1" x="1" y="1" width="28" height="14" fill="hsl(200 30% 55%)"/></svg>Approximate</li>
+        </ul>
+      </section>
+    </aside>
+
+    <section class="map-stage" aria-label="Historical map">
+      <div class="map-view-stack">
+        <div id="map" class="map-view atlas-view active"></div>
+        <div id="leafletMap" class="map-view leaflet-view"></div>
+        <div id="globe" class="map-view globe-view"></div>
+        <div id="loading" class="map-status" hidden><span class="spinner" aria-hidden="true"></span><span id="loadingText">Loading…</span></div>
+        <div id="error" class="map-status map-error" role="alert" hidden><span id="errorText"></span></div>
+        <p id="globeHint" class="globe-hint" hidden>Drag to turn the globe · scroll to zoom</p>
+      </div>
+      <div class="map-controls" role="group" aria-label="Zoom">
+        <button id="zoomIn" class="map-control" type="button" aria-label="Zoom in">+</button>
+        <button id="zoomOut" class="map-control" type="button" aria-label="Zoom out">−</button>
+        <button id="resetMap" class="map-control" type="button" aria-label="Reset map">⟲</button>
+      </div>
+      <div id="mapInfo" class="map-info-panel" aria-live="polite">
+        <div class="map-info-header">
+          <div>
+            <p class="side-kicker">Selected</p>
+            <h2 id="mapInfoTitle">—</h2>
+          </div>
+          <button id="closeMapInfo" class="panel-close" type="button" aria-label="Close information panel">×</button>
+        </div>
+        <div id="mapInfoContent" class="map-info-content">Select a region on the map to inspect it.</div>
+      </div>
+    </section>
+  </main>
+
+  <section id="timelinePanel" class="timeline-panel" aria-label="Timeline">
+    <div class="timeline-head">
+      <span id="timelineYearLabel" class="timeline-current-year" aria-live="polite">—</span>
+      <div class="timeline-actions">
+        <button id="prevButton" class="timeline-button" type="button" aria-label="Previous snapshot">‹</button>
+        <button id="playButton" class="timeline-play" type="button" aria-label="Play through time">Play</button>
+        <button id="nextButton" class="timeline-button" type="button" aria-label="Next snapshot">›</button>
+      </div>
+      <div class="timeline-periods" role="group" aria-label="Jump to an era">
+        <button class="period-button" type="button" data-year="-10000">Prehistory</button>
+        <button class="period-button" type="button" data-year="-3000">Ancient</button>
+        <button class="period-button" type="button" data-year="500">Late antiquity</button>
+        <button class="period-button" type="button" data-year="1000">Medieval</button>
+        <button class="period-button" type="button" data-year="1500">Early modern</button>
+        <button class="period-button" type="button" data-year="1800">Modern</button>
+        <button class="period-button" type="button" data-year="1900">20th century</button>
+        <button class="period-button" type="button" data-year="2000">Contemporary</button>
+      </div>
+    </div>
+    <div class="timeline-container">
+      <div class="timeline-rail">
+        <div id="timelineTicks" class="timeline-ticks" aria-hidden="true"></div>
+        <input id="timeline" class="timeline-slider" type="range" min="0" max="1" step="1" value="0" aria-label="Historical timeline">
+      </div>
+      <div id="timelineLabels" class="timeline-labels">
+        <span id="timelineEarliest">—</span>
+        <span id="timelineCurrent">—</span>
+        <span id="timelineLatest">—</span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="atlas-footer">
+    <span>Borders from <a href="https://github.com/aourednik/historical-basemaps" rel="noopener">aourednik/historical-basemaps</a> (GPL-3.0)</span>
+    <span><span id="featureCount">—</span> regions drawn</span>
+  </footer>
+</div>
+
+<div id="aboutModal" class="modal" hidden>
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <div class="modal-header">
+      <h2 id="aboutTitle">How to read this map</h2>
+      <button id="closeAbout" class="panel-close" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="modal-content">
+      <p>Each colour is a controlling authority (the <code>SUBJECTO</code> field), so an empire's provinces share its colour. Solid borders are precise, dashed ones moderately precise, and faint dotted ones approximate (the dataset's <code>BORDERPRECISION</code> 3, 2 and 1).</p>
+      <p>Borders before the modern era are estimates, often disputed, and often drawn where no one at the time drew a line. Read the map as a picture of what historians think, not a record of sovereignty.</p>
+      <p>Keys: ← → step through snapshots, the era buttons jump, and Play runs the whole span.</p>
+      <p><a href="about.html">More about the data and its limits</a></p>
+    </div>
+  </div>
+</div>
+
+<script src="js/atlas.js" defer></script>
+<script src="js/map-ui.js" defer></script>
+</body>
+</html>

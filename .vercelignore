@@ -1,0 +1,9 @@
+# Not needed by the site; keeps the deploy small. The data the viewer reads (index.json, geojson/) stays.
+svg/
+img/
+examples/
+scripts/
+lib/
+tools/
+.github/
+*.Rmd

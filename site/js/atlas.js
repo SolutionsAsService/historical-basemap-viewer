@@ -33,9 +33,15 @@
      ---------------------------------------------------------- */
 
   const CONFIG = {
-    indexUrl: "./index.json",
-    geojsonPath: "./geojson/",
-    placesUrl: "./geojson/places.geojson",
+    /*
+      The data is upstream's (aourednik/historical-basemaps) and lives at the repository root,
+      one level above site/. If the site is deployed with site/ as its root, the files are not
+      there, so the viewer falls back to the same paths on upstream via jsDelivr.
+    */
+    dataBases: ["../", "https://cdn.jsdelivr.net/gh/aourednik/historical-basemaps@master/"],
+    indexUrl: "index.json",
+    geojsonPath: "geojson/",
+    placesUrl: "geojson/places.geojson",
 
     mapSelector: "#map",
     leafletSelector: "#leafletMap",
@@ -314,11 +320,37 @@
 
 
   /* ----------------------------------------------------------
+     DATA FETCH (local first, upstream CDN second)
+     ---------------------------------------------------------- */
+
+  let dataBase = null;
+
+  async function fetchData(path, options) {
+    const bases = dataBase ? [dataBase] : CONFIG.dataBases;
+    let last;
+    for (const base of bases) {
+      try {
+        const response = await fetch(base + path, options);
+        if (response.ok) {
+          dataBase = base;
+          return response;
+        }
+        last = response;
+      } catch (error) {
+        last = error;
+      }
+    }
+    if (last instanceof Response) return last;
+    throw last || new Error(`Unable to load ${path}`);
+  }
+
+
+  /* ----------------------------------------------------------
      LOAD INDEX
      ---------------------------------------------------------- */
 
   async function loadIndex() {
-    const response = await fetch(CONFIG.indexUrl, {
+    const response = await fetchData(CONFIG.indexUrl, {
       cache: "no-cache"
     });
 
@@ -367,7 +399,7 @@
     clearError();
 
     try {
-      const response = await fetch(url, {
+      const response = await fetchData(url, {
         cache: "force-cache"
       });
 
@@ -420,7 +452,7 @@
     }
 
     try {
-      const response = await fetch(CONFIG.placesUrl);
+      const response = await fetchData(CONFIG.placesUrl);
 
       if (!response.ok) {
         throw new Error(
@@ -820,6 +852,11 @@
       .attr(
         "class",
         featureClass
+      )
+      // colour by controlling authority, as the map and globe views already do
+      .attr(
+        "fill",
+        getFeatureColor
       );
 
     /*

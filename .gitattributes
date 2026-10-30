@@ -1,0 +1,3 @@
+# The viewer's README stays ours when upstream changes its own README (needs: git config merge.ours.driver true;
+# tools/sync_upstream.py sets it).
+README.md merge=ours
