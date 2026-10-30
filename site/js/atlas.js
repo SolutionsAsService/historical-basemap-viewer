@@ -42,6 +42,7 @@
     indexUrl: "index.json",
     geojsonPath: "geojson/",
     placesUrl: "geojson/places.geojson",
+    slimPlacesUrl: "data/places.json",
 
     mapSelector: "#map",
     leafletSelector: "#leafletMap",
@@ -350,9 +351,8 @@
      ---------------------------------------------------------- */
 
   async function loadIndex() {
-    const response = await fetchData(CONFIG.indexUrl, {
-      cache: "no-cache"
-    });
+    // default caching, so the <link rel="preload"> in map.html is reused
+    const response = await fetchData(CONFIG.indexUrl);
 
     if (!response.ok) {
       throw new Error(
@@ -388,6 +388,37 @@
      LOAD HISTORICAL MAP
      ---------------------------------------------------------- */
 
+  /*
+    Snapshot cache: the last few maps stay in memory, and after each load the
+    neighbouring years are fetched in the background, so stepping is instant.
+  */
+  const mapCache = new Map();
+  const CACHE_SIZE = 6;
+
+  function fetchSnapshot(record) {
+    const key = record.filename;
+    if (mapCache.has(key)) {
+      const hit = mapCache.get(key);
+      mapCache.delete(key);
+      mapCache.set(key, hit);
+      return hit;
+    }
+    const pending = fetchData(getGeoJSONUrl(record), { cache: "force-cache" }).then((response) => {
+      if (!response.ok) throw new Error(`Unable to load ${record.filename} (${response.status})`);
+      return response.json();
+    });
+    pending.catch(() => mapCache.delete(key));
+    mapCache.set(key, pending);
+    while (mapCache.size > CACHE_SIZE) mapCache.delete(mapCache.keys().next().value);
+    return pending;
+  }
+
+  function prefetchNeighbours(record) {
+    const i = state.years.indexOf(record);
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 400));
+    idle(() => [i + 1, i - 1].forEach((j) => { if (state.years[j]) fetchSnapshot(state.years[j]); }));
+  }
+
   async function loadHistoricalMap(record) {
     if (!record) {
       throw new Error("No historical map record selected.");
@@ -399,17 +430,8 @@
     clearError();
 
     try {
-      const response = await fetchData(url, {
-        cache: "force-cache"
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `Unable to load ${record.filename} (${response.status})`
-        );
-      }
-
-      const geojson = await response.json();
+      const geojson = await fetchSnapshot(record);
+      prefetchNeighbours(record);
 
       state.currentMap = geojson;
 
@@ -452,7 +474,9 @@
     }
 
     try {
-      const response = await fetchData(CONFIG.placesUrl);
+      // the slim copy built by tools/build_slices.py (same folder as this page); upstream's full file otherwise
+      let response = await fetch(CONFIG.slimPlacesUrl).catch(() => null);
+      if (!response || !response.ok) response = await fetchData(CONFIG.placesUrl);
 
       if (!response.ok) {
         throw new Error(
@@ -3042,7 +3066,7 @@
         the political map.
       */
 
-      loadPlaces()
+      const placesAfterFirstMap = () => loadPlaces()
         .then(() => {
           renderPlaces();
         })
@@ -3118,6 +3142,9 @@
       await setYearIndex(
         initialIndex
       );
+
+      // settlements only once the first map is on screen, so they don't compete for bandwidth
+      placesAfterFirstMap();
 
       if (
         urlState.entity

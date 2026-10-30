@@ -41,3 +41,10 @@ Andon: none.
 - 1 panel round + measured re-render. S2/S3 not met (bounded run).
 - Open: the stack's entrance and breathing are CSS transitions, which this app's background browser pane doesn't advance (screenshots need a second capture); the deploy serves the repo root, so the second `site/vercel.json` relies on the CDN fallback for data.
 - Left on disk for the owner: `H:\UBM\_wt-merge-test` (the throwaway worktree; git has unregistered it, the folder couldn't be deleted while locked).
+
+## Follow-up: load speed (2026-10-30)
+Owner: "its very good however do improve functionality to load quicker if possible" (not a letter grade, so not recorded as one).
+- **Places:** upstream's `places.geojson` is 4.8 MB with ~150 mostly empty properties per point; `tools/build_slices.py` now writes `site/data/places.json` with the four the engine reads and 3-decimal coordinates: **273 KB** (17× smaller). Upstream's file stays the fallback.
+- **Order:** settlements load only after the first map is drawn, instead of racing it.
+- **Stepping:** the last six snapshots stay in memory, and after each load the previous and next years are fetched in idle time. Measured: opening 1700 also fetched 1715 and 1650 in the background; stepping to 1715 needed no network.
+- **Index:** `<link rel="preload">` on `index.json`, and the fetch now uses default caching so the preload is reused.

@@ -126,11 +126,20 @@ def main():
         thumbs.append({"year": rec["year"], "label": label(rec["year"]), "regions": n, "layers": layers})
     (OUT / "thumbs.json").write_text(json.dumps({"w": 360, "h": 180, "thumbs": thumbs}, separators=(",", ":")), encoding="utf-8")
 
+    # places: the 4.8 MB upstream file carries ~150 mostly-empty properties per point; the viewer reads four
+    places = json.loads((ROOT / "geojson" / "places.geojson").read_text(encoding="utf-8"))
+    slim = {"type": "FeatureCollection", "features": [
+        {"type": "Feature",
+         "properties": {k: f["properties"].get(k) for k in ("name", "inhabitedSince", "inhabitedUntil", "civilizations") if f["properties"].get(k) is not None},
+         "geometry": {"type": "Point", "coordinates": [round(c, 3) for c in f["geometry"]["coordinates"][:2]]}}
+        for f in places.get("features", []) if f.get("geometry") and f["geometry"].get("type") == "Point"]}
+    (OUT / "places.json").write_text(json.dumps(slim, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+
     meta = {"snapshots": len(index), "earliest": index[0]["year"], "latest": index[-1]["year"],
             "earliestLabel": label(index[0]["year"]), "latestLabel": label(index[-1]["year"]),
             "regionsMax": max(len(r.get("countries", [])) for r in index)}
     (OUT / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
-    for f in ("slices.json", "thumbs.json", "meta.json"):
+    for f in ("slices.json", "thumbs.json", "places.json", "meta.json"):
         print(f, f"{(OUT / f).stat().st_size / 1024:.0f} KB")
 
 
